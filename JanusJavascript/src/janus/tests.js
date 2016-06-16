@@ -74,7 +74,7 @@ QUnit.test( "Maptable", function( assert ) {
 });
 
 
-QUnit.test( "table", function( assert ) {
+QUnit.test( "table1", function( assert ) {
 
   var page = preparePage("<DIALOG><TABLE name='sql' > <COLUMN name='a' /> <COLUMN name='b'/> </TABLE><STRING name='a' source='sql.a'/><STRING name='b' source='sql.b' /></DIALOG>");
 
@@ -85,6 +85,21 @@ QUnit.test( "table", function( assert ) {
 
 });
 
+QUnit.test( "table2", function( assert ) {
+	
+	var page = preparePage("<DIALOG><STRING name='a' source='liste.currentRow' /><TABLE name='liste'><COLUMN name='value' /><COLUMN name='text' /></TABLE></DIALOG>");
+	page.DataSources.liste.refresh();
+	page.DataSources.liste.doUpdate = false;
+	page.DataSources.liste.currentRow.setValue(1);
+	
+	assert.equal( page.DataSources.a.value,'1');
+	
+	page.DataSources.liste.currentRow.setValue(0);
+	
+	assert.equal( page.DataSources.a.value,'0');
+	
+	
+});
 
 QUnit.test( "bean", function( assert ) {
 	
@@ -109,4 +124,5 @@ QUnit.test( "bean", function( assert ) {
   assert.equal( testerB,'2');
 
 });
+
 

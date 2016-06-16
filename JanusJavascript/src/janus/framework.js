@@ -329,29 +329,54 @@ var dataTag = {
                      for (var i=0;i < this.childs.length;i++) {
                         this.addListener(this.childs[i]);
                      }
+                     this.addListener(this.currentRow);
                }, 
                refresh : function() { 
                       this.updateData();
                       this.fireCurrentRow();
                }, 
-               configure : function() {
+               configure : function( DataSources) {
                      this.list = {
                          currentRow : 0,
                          data : [],
                          findValue : findValue
                      };
                      for (var i=0;i < this.childs.length;i++) {
-                        this.childs[i].setList(this.list);
+                        this.childs[i].setList(this);
                      };
                      this.firstColName = this.childs[0].colName;
                      this.calculateValue = function (ev) {
                         return this.list.findValue(this.firstColName, ev.value);
                      }
+                     
+                     this.currentRow = newDataSource (this.name +".currentRow" ,dataTag.TABLE, {}, DataSources);
+                     this.currentRow.table = this;
+                     this.currentRow.setValue = function ( value) {
+                         this.table.setCurrentRow(value);
+                     };
+                     this.currentRow.calculateValue = function (ev) {
+                         return this.table.list.currentRow;
+                     }
+                     this.currentRow.status = 'valid';
+                     this.currentRow.updateData = doNothing;
+                     this.currentRow.childs = [];
+                     this.currentRow.createEvent = function( hint ) {  
+                         var ev = {
+                            value : this.table.list.currentRow,
+                            source: this,
+                            hint: hint,
+                            currentRow : this.table.list.currentRow,
+                            data : this.table.list.data
+                         };
+                         return ev;
+                      };
+                     
+                                        
                      this.status = 'valid';
                },
               updateData: function() {
             	       if (this.doUpdate) {
-                       var rowCount = getRandomInt(10,30);
+                       var rowCount = getRandomInt(3,10);
                        this.list.currentRow = 0; 
                        this.list.data = []; 
                        for (var r=0;r < rowCount;r++) {
@@ -369,8 +394,13 @@ var dataTag = {
              },
 
     COLUMN : { 
-               setList : function ( list ) {
-                  this.list =  list;
+    	  		setValue : function ( value) {
+    	  			this.list.findValue(this.colName, value);
+    	  			this.table.fireCurrentRow();
+    	  		},
+               setList : function ( table ) {
+            	  this.table = table; 
+                  this.list =  table.list;
                },
                bind : function(DataSources) {}, 
                refresh : function() {}, 
