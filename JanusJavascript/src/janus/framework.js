@@ -1,4 +1,5 @@
 
+var JanusJS = (function () {
 
 function doNothing () {
 }
@@ -33,9 +34,6 @@ function addListener ( child) {
 
 var classFunctions = {};
 
-function addClassFunction( name , f) {
-	classFunctions[name] = f;
-}
 
 function callClassFunction ( name , command, values) {
 	return (classFunctions[name])( command, values);
@@ -43,11 +41,8 @@ function callClassFunction ( name , command, values) {
 
 var dialogValue = {}
 
-//var DataSources = {}
+// var DataSources = {}
 
-function getModelElement() {
-	return this.DataSources[this.attributes['model']];
-}
 
 function newDataSource ( name , sourceType, attributes, DataSources) {
          var source = Object.create(sourceType);
@@ -564,7 +559,7 @@ function replaceValues ( template, values ) {
 	}
    var erg = template;  
  
-   //  in notwenig, damit auch Properties von prototype genommen werden
+   // in notwenig, damit auch Properties von prototype genommen werden
    for (var key in values) {
        erg = replaceOneValue(erg,key,values[key]);
    }
@@ -695,12 +690,6 @@ function fillRowsFromList( values) {
 }
 
 
-function setCurrentRow( divID, row ) {
-	//alert( model + row );
-	getModelElementFromDivID(divID).setCurrentRow(row);
-	updateGui();
-	return false;
-}
 
 function newGuiTag( tagName, templateHash ) {
      var obj = new Object();
@@ -731,7 +720,7 @@ guiTag.LABEL.configure  = function () {
 	this.title = this.attributes.title;
 };
 
-guiTag.BUTTON = newGuiTag("BUTTON", { BUTTON: "<input type='button' value='${title}' name='${model}' onClick='getModelElementFromDivID(\"${id}\").refresh();return false;' />" });
+guiTag.BUTTON = newGuiTag("BUTTON", { BUTTON: "<input type='button' value='${title}' name='${model}' onClick='JanusJS.getModelElementFromDivID(\"${id}\").refresh();return false;' />" });
 guiTag.BUTTON.fill = simpleFill;
 guiTag.BUTTON.configure  = doNothing;
 
@@ -775,8 +764,8 @@ guiTag.SHOWTABLE = newGuiTag("SHOWTABLE", {
 	header: "<TH>${header}</TH>",
 	headerEnd: "</TR></THEAD><TBODY>",
 
-	rowStart: "<TR><TD  onClick=\"return setCurrentRow('${id}',${row});\"  >${row}</TD>", 
-	cell: "<TD onClick=\"return setCurrentRow('${id}',${row});\" >${value}</TD>",
+	rowStart: "<TR><TD  onClick=\"return JanusJS.setCurrentRow('${id}',${row});\"  >${row}</TD>", 
+	cell: "<TD onClick=\"return JanusJS.setCurrentRow('${id}',${row});\" >${value}</TD>",
 	rowEnd: "</TR>",
 	
 	rowStartSelected: "<TR class='selected' ><TD>${row}</TD>", 
@@ -794,7 +783,7 @@ guiTag.SHOWCOLUMN.configure  = function () {
 }
 
 guiTag.COMBO = newGuiTag("COMBO", { 
-	start: "<div class='input-control select'  ><select name='${model}' onchange=\"setCurrentRow('${id}',this.selectedIndex);return true;\" >", 
+	start: "<div class='input-control select'  ><select name='${model}' onchange=\"JanusJS.setCurrentRow('${id}',this.selectedIndex);return true;\" >", 
 	row: "<option value='${row}' >${text}</option>",
 	rowSelected: "<option value='${row}' selected >${text}</option>",
 	end: "</select></div>" });
@@ -805,9 +794,10 @@ guiTag.COMBO.configure  = doNothing;
 
 guiTag.RADIO = newGuiTag("RADIO", { 
 	start: "", 
-	row: " <label class='input-control radio small-check'> <input type='radio' name='${model}' value='${row}' onchange=\"return setCurrentRow('${id}',this.value);\" > <span class='check'></span><span class='caption'>${text}</span></label>",
-//	rowSelected: "<input type='radio' name='${model}' value='${row}' checked >${text}<br/>",
-	rowSelected: " <label class='input-control radio small-check'> <input type='radio' name='${model}' checked value='${row}' onchange=\"return setCurrentRow('${id}',this.value);\" > <span class='check'></span><span class='caption'>${text}</span></label>",
+	row: " <label class='input-control radio small-check'> <input type='radio' name='${model}' value='${row}' onchange=\"return JanusJS.setCurrentRow('${id}',this.value);\" > <span class='check'></span><span class='caption'>${text}</span></label>",
+// rowSelected: "<input type='radio' name='${model}' value='${row}' checked
+// >${text}<br/>",
+	rowSelected: " <label class='input-control radio small-check'> <input type='radio' name='${model}' checked value='${row}' onchange=\"return JanusJS.setCurrentRow('${id}',this.value);\" > <span class='check'></span><span class='caption'>${text}</span></label>",
 	
 	end: "" });
 guiTag.RADIO.fill  = fillRowsFromList;
@@ -815,16 +805,18 @@ guiTag.RADIO.configure  = doNothing;
 
 
 guiTag.LIST = newGuiTag("LIST", { 
-//	start: "<input list='listValues${id}'  name='${model}' onchange=\"return setCurrentRow('${id}',this.value);\" ><datalist id='listValues${id}' >", 
-//	row: "<option value='${row}' >${text}</option>",
-//	rowSelected: "<option value='${row}' selected >${text}</option>",
-//	end: "</datalist>"
+// start: "<input list='listValues${id}' name='${model}' onchange=\"return
+// JanusJS.setCurrentRow('${id}',this.value);\" ><datalist id='listValues${id}'
+// >",
+// row: "<option value='${row}' >${text}</option>",
+// rowSelected: "<option value='${row}' selected >${text}</option>",
+// end: "</datalist>"
 		
 	
 	
 		start: " <div class='listview set-border'  id='listValues${id}' >", 
-		row: "<div class='list'   onClick=\"return setCurrentRow('${id}','${row}');\" ><span class='list-title'>${text}</span></div>",
-		rowSelected: "<div class='list block-shadow-info' onClick=\"return setCurrentRow('${id}','${row}');\" > </span><span class='list-title'>${text}</span></div>",
+		row: "<div class='list'   onClick=\"return JanusJS.setCurrentRow('${id}','${row}');\" ><span class='list-title'>${text}</span></div>",
+		rowSelected: "<div class='list block-shadow-info' onClick=\"return JanusJS.setCurrentRow('${id}','${row}');\" > </span><span class='list-title'>${text}</span></div>",
 		end: "</div>"		
 		
 });
@@ -845,7 +837,7 @@ guiTag.MENU.fill  = function ( values) {
 guiTag.MENU.configure  = doNothing;
 
        
-guiTag.MENUITEM  = newGuiTag("MENUITEM", { MENUITEM: "<li ><a href='#'    onClick='getModelElementFromDivID(\"${id}\").refresh();return false;' >${title}</a></li>" });
+guiTag.MENUITEM  = newGuiTag("MENUITEM", { MENUITEM: "<li ><a href='#'    onClick='JanusJS.getModelElementFromDivID(\"${id}\").refresh();return false;' >${title}</a></li>" });
 guiTag.MENUITEM.simpleFill  = simpleFill;
 guiTag.MENUITEM.fill  = function ( values) {
 	values.title = this.attributes.title;
@@ -854,8 +846,9 @@ guiTag.MENUITEM.fill  = function ( values) {
 guiTag.MENUITEM.configure  = doNothing;
 
 guiTag.TAB  = newGuiTag("TAB", { 
-//	header: "<TH onClick='updateTab(\"${parentId}\",\"${id}\");' >${title}</TH>", 
-//	header: "<li class='tabHeaderCell' id='tabHeader${id}' onClick='updateTab(\"${parentId}\",\"${id}\");' >${title}</li>",
+// header: "<TH onClick='updateTab(\"${parentId}\",\"${id}\");' >${title}</TH>",
+// header: "<li class='tabHeaderCell' id='tabHeader${id}'
+// onClick='updateTab(\"${parentId}\",\"${id}\");' >${title}</li>",
 	header: "<li><a href='#${id}' >${title}</a></li>",
 
 	start: "<DIV class='frame' id='${id}' >", 
@@ -869,10 +862,10 @@ guiTag.TAB.fill  = function ( values) {
 guiTag.TAB.configure  = doNothing;
 
 guiTag.TABS  = newGuiTag("TABS", { 
-//	start: "<TABLE id='${id}' >", 
-//	end: "</TABLE>", 
-//	headerStart: "<TR>", 
-//	headerEnd: "</TR><TR collspan='${tabCount}' ><TD>",
+// start: "<TABLE id='${id}' >",
+// end: "</TABLE>",
+// headerStart: "<TR>",
+// headerEnd: "</TR><TR collspan='${tabCount}' ><TD>",
 
 	
 	start: "<DIV class='tabcontrol2' data-role='tabcontrol' id='${id}' >", 
@@ -951,10 +944,6 @@ function updateTab( divParent, divTab) {
 var idCounter = 0;
 var allGuiElements = {};
 
-function getModelElementFromDivID ( divID) {
-	return allGuiElements[divID].getModelElement();
-}
-
 function newGuiElement ( proto , attributes, DataSources) {
              var guiElement =  Object.create(proto);
              guiElement.DataSources = DataSources;
@@ -1009,7 +998,15 @@ function newGuiElementFromDOM ( element ,  DataSources) {
          return undefined;
 }
 
-function buildPage ( element) {
+
+
+function  getModelElement() {
+	return this.DataSources[this.attributes['model']];
+}
+
+return {
+
+	buildPage : function ( element) {
          if (element.nodeType == 1) {
        	   DataSources = {};
 
@@ -1034,6 +1031,26 @@ function buildPage ( element) {
          }
          alert("" + element.nodeName +" hat keine Zuordnung");
          return undefined;
-}
+	},
+	
+
+	addClassFunction : function( name , f) {
+		classFunctions[name] = f;
+	},
+	
+
+	getModelElementFromDivID : function ( divID) {
+		return allGuiElements[divID].getModelElement();
+	},
 
 
+	setCurrentRow : function ( divID, row ) {
+		// alert( model + row );
+		this.getModelElementFromDivID(divID).setCurrentRow(row);
+		this.updateGui();
+		return false;
+	}
+	
+};
+
+})();

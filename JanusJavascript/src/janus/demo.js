@@ -1,4 +1,32 @@
 
+JanusJS.updateGui = function() {
+	this.showResult('place', activePage.fill({}));
+	var i = activePage.urtext.indexOf('&lt;VBOX&gt;');
+	if (i >= 0) {
+		this.showResultCode('dataResult', activePage.urtext.substr(0, i));
+		this.showResultCode('guiResult', activePage.urtext.substr(i));
+	} else {
+		this.showResultCode('dataResult', '');
+		this.showResultCode('guiResult', activePage.urtext);
+	}
+}
+
+JanusJS.showResult = function(place, text) {
+	var place = document.getElementById(place);
+	if (place != undefined) {
+		place.innerHTML = text;
+	}
+}
+
+JanusJS.showResultCode = function(place, text) {
+	var place = document.getElementById(place);
+	if (place != undefined) {
+		place.innerHTML = text;
+	}
+}
+
+
+
 function loadXMLPage(pages, name,initFunction) {
 	$.ajax({
 		url : 'pages/' + name + '.xml',
@@ -12,8 +40,6 @@ function loadXMLPage(pages, name,initFunction) {
 	});
 }
 
-
-
 function preparePage(text) {
 	parser = new DOMParser();
 	xmlDoc = parser.parseFromString(text, "text/xml");
@@ -26,36 +52,11 @@ function preparePage(text) {
 	text = text.replace(/ /g, '&nbsp;');
 	text = text.replace(/\n/g, '<br>');
 
-	var page = buildPage(xmlDoc.documentElement);
+	var page = JanusJS.buildPage(xmlDoc.documentElement);
 	page.urtext = text;
 	return page;
 }
 
-function updateGui() {
-	showResult('place', activePage.fill({}));
-	var i = activePage.urtext.indexOf('&lt;VBOX&gt;');
-	if (i >= 0) {
-		showResultCode('dataResult', activePage.urtext.substr(0, i));
-		showResultCode('guiResult', activePage.urtext.substr(i));
-	} else {
-		showResultCode('dataResult', '');
-		showResultCode('guiResult', activePage.urtext);
-	}
-}
-
-function showResult(place, text) {
-	var place = document.getElementById(place);
-	if (place != undefined) {
-		place.innerHTML = text;
-	}
-}
-
-function showResultCode(place, text) {
-	var place = document.getElementById(place);
-	if (place != undefined) {
-		place.innerHTML = text;
-	}
-}
 
 var pages = {};
 
@@ -75,13 +76,13 @@ loadXMLPage(pages,'listen', function (page) {
 	page.DataSources.liste.doUpdate = false;
 });
 
-addClassFunction('menuauswahl', function(command, values) {
+JanusJS.addClassFunction('menuauswahl', function(command, values) {
 	var page = pages[command];
 	activePage = page;
-	updateGui();
+	JanusJS.updateGui();
 })
 
 loadXMLPage(pages,'menu', function (page) {
-	showResult('menu', page.fill({}));
+	JanusJS.showResult('menu', page.fill({}));
 });
 

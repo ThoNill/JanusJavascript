@@ -4,7 +4,7 @@ function preparePage (text) {
   parser = new DOMParser();
   xmlDoc = parser.parseFromString(text,"text/xml");
 
-  return buildPage(xmlDoc.documentElement);
+  return JanusJS.buildPage(xmlDoc.documentElement);
 }
 
 
@@ -105,7 +105,7 @@ QUnit.test( "bean", function( assert ) {
 	
   tester = '';	
 	
-  addClassFunction('test', function ( command , values) {
+  JanusJS.addClassFunction('test', function ( command , values) {
 	  tester = command;
 	  testerA = values.aa;
 	  testerB = values.bb;
