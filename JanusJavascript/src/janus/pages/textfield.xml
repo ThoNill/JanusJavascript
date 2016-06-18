@@ -5,6 +5,7 @@
 	<STRING name='int' default='5' />
 	<STRING name='password' default='password' />
 	<VBOX>
+	    <LABEL title="Hier gibt es verschiedene Arten von Feldern."/>
 		<TEXTFIELD model='text' />
 		<DATEFIELD model='datum' />
 		<MONEYFIELD model='money' />

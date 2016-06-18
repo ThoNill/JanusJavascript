@@ -9,9 +9,9 @@
 	</BEAN>
 	<MENUBAR>
 		<MENU title='Beispiele'>
-			<MENUITEM title='Tabs' model='tabs' />
 			<MENUITEM title='Eingabefelder' model='textfield' />
-			<MENUITEM title='Map' model='maptable' />
+			<MENUITEM title='Auswahl' model='maptable' />
+			<MENUITEM title='Tabulatoren' model='tabs' />
 		</MENU>
 		<MENU title='Abhängigkeiten'>
 			<MENUITEM title='Updates' model='textfieldUpdates' />

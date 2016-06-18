@@ -65,8 +65,8 @@ function preparePage(text) {
 var pages = {};
 
 loadXMLPage(pages,'tabs', function (page) {
-	page.DataSources.a.setValue("das ist a");
-	page.DataSources.b.setValue("das ist b");
+	page.DataSources.a.setValue("das ist Tab a");
+	page.DataSources.b.setValue("das ist Tab b");
 });
 
 loadXMLPage(pages,'textfield', function (page) {
@@ -78,7 +78,9 @@ loadXMLPage(pages,'textfield', function (page) {
 });
 
 loadXMLPage(pages,'textfieldUpdates', function (page) {
-	page.DataSources.a.refresh();
+	page.DataSources.a1.refresh();
+	page.DataSources.a2.refresh();
+	page.DataSources.a3.refresh();
 });
 
 loadXMLPage(pages,'maptable', function (page) {});
