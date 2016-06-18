@@ -1,0 +1,21 @@
+<DIALOG>
+	<STRING name='a' default='1' />
+	<STRING name='b' source='a' />
+	<STRING name='a2' default='1' source="b2"/>
+	<STRING name='b2' source='a2' />
+	<TABS>
+		<TAB title='Einseitig'>
+			<VBOX>
+				<TEXTFIELD model='a' />
+				<TEXTFIELD model='b' />
+			</VBOX>
+		</TAB>
+		<TAB title='Gegenseitig'>
+			<VBOX>
+				<TEXTFIELD model='a2' />
+				<TEXTFIELD model='b2' if="[0-9]+" at="a2" />
+			</VBOX>
+		</TAB>
+
+	</TABS>
+</DIALOG>

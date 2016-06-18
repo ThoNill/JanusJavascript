@@ -1,6 +1,10 @@
 
-JanusJS.updateGui = function() {
-	this.showResult('place', activePage.fill({}));
+JanusJS.updateGui = function( ifNeeded) {
+	if (ifNeeded == true) {
+		activePage.fillIfNeeded({});
+	} else {
+		this.showResult('place', activePage.fill({}));
+	}
 	var i = activePage.urtext.indexOf('&lt;VBOX&gt;');
 	if (i >= 0) {
 		this.showResultCode('dataResult', activePage.urtext.substr(0, i));
@@ -66,6 +70,14 @@ loadXMLPage(pages,'tabs', function (page) {
 });
 
 loadXMLPage(pages,'textfield', function (page) {
+	page.DataSources.text.refresh();
+	page.DataSources.datum.refresh();
+	page.DataSources.money.refresh();
+	page.DataSources.int.refresh();
+	page.DataSources.password.refresh();
+});
+
+loadXMLPage(pages,'textfieldUpdates', function (page) {
 	page.DataSources.a.refresh();
 });
 
