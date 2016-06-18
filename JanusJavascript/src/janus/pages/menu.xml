@@ -16,9 +16,9 @@
 		<MENU title='Abhängigkeiten'>
 			<MENUITEM title='Updates' model='textfieldUpdates' />
 		</MENU>
-		<MENU title='eins'>
-			<MENUITEM title='Seite 1' model='textfield' />
+		<MENU title='Ansichten einer Liste'>
+			<MENUITEM title='Als Combo, Liste, Radio, Tabelle' model='listen' />
 		</MENU>
 	</MENUBAR>
-	<BUTTON model='listen' title='Ansichten einer Liste' />
+	<!-- <BUTTON model='listen' title='Ansichten einer Liste' /> -->
 </DIALOG>

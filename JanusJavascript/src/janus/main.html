@@ -20,13 +20,14 @@ http://www.metroui.org/
 </head>
 <body>
 	<div class="container page-content">
-		<div id="menu">Hallo</div>
-
+		<div id="menu">Leider fehlt das Menu</div>
+		<div id="error"></div>
 		<DIV class='tabcontrol2' data-role='tabcontrol' id='demo'>
 			<ul class='tabs'>
 				<li><a href='#guiTab'>Oberfl&auml;che</a></li>
 				<li><a href='#modelTab'>Datenmodel</a></li>
 				<li><a href='#guiSourceTab'>GUI Beschreibung</a></li>
+				<li><a href='#licenseTab'>Metro UI Lizenz</a></li>
 			</ul>
 			<DIV class='frames'>
 				<DIV class='frame' id='guiTab'>
@@ -38,6 +39,9 @@ http://www.metroui.org/
 				<DIV class='frame' id='guiSourceTab'>
 					<code id="guiResult"></code>
 				</DIV>
+				<DIV class='frame' id='licenseTab'>
+					<a href="https://metroui.org.ua/license.html" >Metro UI Lizenz</a>
+				</DIV>			
 			</DIV>
 		</div>
 	</div>
@@ -45,25 +49,5 @@ http://www.metroui.org/
 <script src="testdaten.js"></script>
 <script src="framework.js"></script>
 <script src="demo.js"></script>
-<script>
-	/*
-	 function showResult( text ) {
-	 var place = document.getElementById('place');
-	 if (place != null) {
-	 place.innerHTML = text;
-	 }
-	 }
 
-
-
-	 var text = "<DIALOG><VBOX><TEXTFIELD/></VBOX></DIALOG>";
-
-	 parser = new DOMParser();
-	 xmlDoc = parser.parseFromString(text,"text/xml");
-
-	 var test2Dialog = buildPage(xmlDoc.documentElement);
-
-	 showResult( test2Dialog.fill({name: 'TOLL'}));
-	 */
-</script>
 </html>
