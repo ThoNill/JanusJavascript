@@ -18,7 +18,7 @@ function createIfThen (element, DataSources) {
 	            	 this.element.valueChanged(ev);
 	            },
 	            isOk : function () {
-	            	return this.regex.test(dataElement.value);
+	            	return this.regex.test(this.dataElement.value);
 	            }
 		};
 		element.ifThen = re;
@@ -47,8 +47,7 @@ function addToArray ( arr, child) {
          if (arr == undefined) {
              arr = [];
          }
-         var l = arr.length;
-         arr[l] = child;
+         arr[arr.length] = child;
       }
       return arr;
 }
@@ -66,8 +65,8 @@ function addListener ( child) {
 var classFunctions = {};
 
 
-function callClassFunction ( name , command, values, callIfOk, callIfError) {
-	return (classFunctions[name])( command, values, callIfOk, callIfError);
+function callClassFunction ( name , command, values, callOnOk, callOnError) {
+	return (classFunctions[name])( command, values, callOnOk, callOnError);
 }
 
 var dialogValue = {}
@@ -90,7 +89,7 @@ function newDataSource ( name , sourceType, attributes, DataSources) {
                    this.status = 'invalid';
                    needUpdate.data[this.name] = this;
                 }
-         } 
+         }; 
 	 
          source.update = function () {
                 if (this.status == 'invalid') {
@@ -100,7 +99,7 @@ function newDataSource ( name , sourceType, attributes, DataSources) {
                     this.fireChanged('refresh');
                     this.validate();
                 } 
-         } 
+         }; 
 
 
          source.validate = function () {
@@ -108,7 +107,7 @@ function newDataSource ( name , sourceType, attributes, DataSources) {
                     this.status = 'valid';
                     dialogValue[this.name] = this.value;  
                 } 
-         } 
+         }; 
          
          source.valueChanged = function ( ev ) {
                 if (this.status == 'valid') {
@@ -117,16 +116,16 @@ function newDataSource ( name , sourceType, attributes, DataSources) {
                         this.invalidate();
                     }
                 }
-         }
+         };
 
 
          source.hasChanged = function ( ev ) {
 		        return (this.value != ev.value);
-         }
+         };
 
          source.calculateValue = function ( ev ) {
 		         return ev.value;
-         }
+         };
 
          source.fireChanged = function( hint ) {
              if (this.listeners == undefined) {
@@ -141,14 +140,14 @@ function newDataSource ( name , sourceType, attributes, DataSources) {
                  	}
             	 }
              }
-         }
+         };
 
          source.bindToName = function ( name, DataSources) {
               var partner = DataSources[name.trim()];
               if (partner != undefined) {
                   partner.addListener(this);
               }
-         }
+         };
 
          source.bindToMultipleNames = function ( names, DataSources) {
             if (names == undefined || names == null) {
@@ -159,7 +158,7 @@ function newDataSource ( name , sourceType, attributes, DataSources) {
             	  var name = namesAsArray[i];
                   this.bindToName(name,DataSources);
             }
-         }
+         };
      
 
          DataSources[name] = source;
@@ -458,11 +457,100 @@ var dataTag = {
 
                priority:  4
              },
+  //           guiActionOnGuiElements
+        GUIACTION : { 
+                 bind : function(DataSources) {
+              	   
+              	   var tliste = this.attributes['foreach'];
+              	   var liste = tliste.split(/ *, */);
+              	   for (var i=0; i <= liste.length;i++) {
+              		   var name = liste[i];
+              		   var dataElement = DataSources[name];
+              		   this.foreach = addToArray(this.foreach,dataElement);
+              	   }
+              	   this.classFunction = classFunctions[this.classname];
+              	   
+                 }, 
+                 refresh : function(callOnOk, callOnError) {
+              	  
+              	   for (var i= this.foreach.length-1; i >= 0;i--) {
+              		   var dataElement = this.foreach[i];
+              		   this.guiActionOnGuiElements(dataElement);
+              	   }
+              	   
+                 },
+                 
+                 guiActionOnGuiElements : function ( model){
+                	 var propertyNames = Object.getOwnPropertyNames(allGuiElements);
+                     for (var i = 0; i < propertyNames.length; i++){
+                    	 var name = propertyNames[i];
+                    	 var guiElement = allGuiElements[name];
+                    	 var modelElement = guiElement.getModelElement();
+                    	 if (model == modelElement) {
+                    		 var htmlElement = document.getElementById(name);
+                    		 this.classFunction(htmlElement,this.param);
+                    	 }
+                    }
+                },
+                 configure : function() {
+              	   this.classname = this.attributes["class"];
+              	   this.param = this.attributes['param'];
+              	   
+                 },
+                 updateData: function() {},
+                 getName : getName,
 
+                 priority:  4
+               },
     ACTION : { 
-               bind : function(DataSources) {}, 
-               refresh : function() {}, 
-               configure : function() {},
+               bind : function(DataSources) {
+            	   
+            	   var tliste = this.attributes['foreach'];
+            	   var liste = tliste.split(/ *, */);
+            	   for (var i=0; i <= liste.length;i++) {
+            		   var name = liste[i];
+            		   var dataElement = DataSources[name];
+            		   this.foreach = addToArray(this.foreach,dataElement);
+            	   }
+            	   this.classFunction = classFunctions[this.classname];
+            	   
+            	   
+               }, 
+               refresh : function(callOnOk, callOnError) {
+            	  var callTheAction = true; 
+            	  if (this.ifThen) {
+            		  callTheAction = this.ifThen.isOk();
+                  }
+            	  if (callTheAction) {
+            		  this.callListe = this.createCallListe(callOnOk, callOnError);
+                      if (this.callListe) {
+                    	  this.callListe();
+                      }
+                  } 
+               }, 
+               createDanachFunction : function (dataElement,danach,callOnError) {
+            	   return this.callActionFunction.bind(this,dataElement,danach,callOnError);
+       		   },
+               createCallListe : function(callOnOk, callOnError) {
+            	   var danach = callOnOk;
+            	   for (var i= this.foreach.length-1; i >= 0;i--) {
+            		   var dataElement = this.foreach[i];
+            		   danach = this.createDanachFunction(dataElement,danach,callOnError);
+            	   }
+            	   return danach;
+               },
+               
+               callActionFunction: function (dataElement, callOnOk, callOnError) {
+            	   if (this.classFunction) {
+            		   this.classFunction( dataElement, callOnOk, callOnError);
+            	   } else {
+            		   dataElement.refresh(callOnOk, callOnError);
+            	   }
+               },
+               configure : function() {
+            	   this.classname = this.attributes["class"];
+            	   
+               },
                updateData: function() {},
                getName : getName,
 
@@ -484,8 +572,8 @@ var dataTag = {
     BEAN :   { 
                bind : function(DataSources) {}, 
                refresh : function() {}, 
-               bean : function ( command, values, callIfOk, callIfError) {
-                      callClassFunction(this.className,command, values, callIfOk, callIfError);    	   
+               bean : function ( command, values, callOnOk, callOnError) {
+                      callClassFunction(this.className,command, values, callOnOk, callOnError);    	   
                },
                configure : function() {
             	   this.className = this.attributes['class'];
@@ -511,7 +599,7 @@ var dataTag = {
                  bind : function(DataSources) {
  
                  }, 
-                 refresh : function() {
+                 refresh : function( callOnOk, callOnError) {
                 	 var values = {};
                 	 if (this.childs != undefined) {
                 	   for (var i=0;i < this.childs.length;i++) {
@@ -524,14 +612,20 @@ var dataTag = {
                 	 }
                 	 
                 	 var obj = this;
-                	 var callIfOk = function ( value) {
+                	 var setOk = function ( value) {
                 		 obj.value = value;
+                		 if (callOnOk) {
+                			 callOnOk();
+                		 }
                 	 };
-                	 var callIfError = function ( errorText) {
+                	 var setError = function ( errorText) {
                 		 JanusJS.addError(errorText);
+                		 if (callOnError) {
+                			 callOnError();
+                		 }
                 	 };
                 	 
-                	 this.bean.bean( this.command, values,callIfOk,callIfError);
+                	 this.bean.bean( this.command, values,setOk,setError);
                  }, 
                  configure : function( DataSources) {
                 	 this.command = this.attributes['command'];
@@ -606,7 +700,7 @@ function sammleVariablen ( text) {
 function replaceOneValue ( template, key, value ) {
    var searchText = '${' + key +'}';  
    var erg = template;  
-   while( erg.indexOf(searchText) >=0) {
+   while( erg.toString().indexOf(searchText) >=0) {
         erg = erg.replace(searchText,value);  
    }
    return erg;
@@ -1109,6 +1203,8 @@ function bindGuiChildElements( element,DataSources) {
 		}
      }
 }
+
+
 
 
 function fillIfNeeded(values,element) {

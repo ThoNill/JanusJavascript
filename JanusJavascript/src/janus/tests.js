@@ -125,4 +125,32 @@ QUnit.test( "bean", function( assert ) {
 
 });
 
+QUnit.test( "action", function( assert ) {
+	
+	  var tester = {};	
+	  var callIndex = 1;
+	  
+		
+	  JanusJS.addClassFunction('test', function ( action, callOnOk,callOnError) {
+		  tester[action.getName()] = callIndex;
+		  callIndex++;
+		  if (callOnOk) {
+			  callOnOk();
+		  }
+	  })	
+
+	  var page = preparePage("<DIALOG><STRING name='a' /> <STRING name='b'/> <STRING name='c'/> <ACTION name='testAction' class='test' foreach='a,b,c'></DIALOG>");
+
+	  page.DataSources.a.setValue('1');
+	  page.DataSources.b.setValue('2');
+	  page.DataSources.c.setValue('2');
+	  
+	  page.DataSources.testAction.refresh();
+	 
+	  assert.equal( tester['a'],1);
+	  assert.equal( tester['b'],2);
+	  assert.equal( tester['c'],3);
+	
+});
+
 

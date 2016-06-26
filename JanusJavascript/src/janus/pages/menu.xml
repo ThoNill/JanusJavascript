@@ -5,7 +5,8 @@
 		<CALL name='textfieldUpdates' command='textfieldUpdates' />
 		<CALL name='maptable' command='maptable' />
 		<CALL name='listen' command='listen' />
-		<CALL name='seite1' command='seite1' />
+		<CALL name='listenAuswahl' command='listenAuswahl' />
+		<CALL name='actions' command='actions' />
 	</BEAN>
 	<BEAN name='menuBean2' class='spaetLaden'>
 		<CALL name='fehler1' command='seiteMitFehler1' />
@@ -16,12 +17,14 @@
 			<MENUITEM title='Eingabefelder' model='textfield' />
 			<MENUITEM title='Auswahl' model='maptable' />
 			<MENUITEM title='Tabulatoren' model='tabs' />
+			<MENUITEM title='Aktionen' model='actions' />
 		</MENU>
 		<MENU title='Abhängigkeiten'>
 			<MENUITEM title='Updates' model='textfieldUpdates' />
 		</MENU>
 		<MENU title='Ansichten einer Liste'>
 			<MENUITEM title='Als Combo, Liste, Radio, Tabelle' model='listen' />
+			<MENUITEM title='Auswahl aus einer Liste' model='listenAuswahl' />
 		</MENU>
 		<MENU title='Seiten mit Fehlern'>
 			<MENUITEM title='Modelelement fehlt' model='fehler1' />
