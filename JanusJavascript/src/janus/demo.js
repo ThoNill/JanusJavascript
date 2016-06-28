@@ -142,6 +142,12 @@ loadXMLPage(pages, 'listenAuswahl', function(page) {
 	page.DataSources.liste.doUpdate = false;
 });
 
+loadXMLPage(pages, 'rules', function(page) {
+	page.DataSources.text.setValue("");
+
+});
+
+
 function setClassOfDomElement( domElement, className) {
 	domElement.className += " " + className;
 }

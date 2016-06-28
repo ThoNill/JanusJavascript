@@ -13,6 +13,16 @@
 </head>
 <body>
 	<div class="container page-content">
+	
+	  <div data-role="dialog" id="errorDialog" class="padding20" data-close-button="true" data-type="alert" onclick="hideMetroDialog('#errorDialog');JanusJS.focusNextField();">
+            <h4>Fehler</h4>
+            <p id="errorText"> </p>
+            <input  id='errorButton' type='button' value='Ok' name='${model}' 
+            onClick="hideMetroDialog('#errorDialog');JanusJS.focusNextField();return false;" />
+      </div>
+	
+	
+	
 		<div id="menu">Leider fehlt das Menu</div>
 		<DIV class='tabcontrol2' data-role='tabcontrol' id='demo'>
 			<ul class='tabs'>
@@ -55,6 +65,8 @@
 	</div>
 </body>
 <script src="testdaten.js"></script>
+<script src="basis.js"></script>
+<script src="rules.js"></script>
 <script src="framework.js"></script>
 <script src="demo.js"></script>
 

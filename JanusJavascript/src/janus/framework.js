@@ -32,35 +32,7 @@ function createIfThen (element, DataSources) {
     }
 }
 
-function doNothing () {
-}
 
-function getName(attributes) {
-	if (attributes == undefined) {
-		return this.getName(this.attributes);
-	}
-    return attributes['name'];
-}
-
-function addToArray ( arr, child) {
-      if (child != undefined) {
-         if (arr == undefined) {
-             arr = [];
-         }
-         arr[arr.length] = child;
-      }
-      return arr;
-}
-
-function addChild ( child) {
-      this.childs = addToArray(this.childs, child);
-      return this;
-}
-
-function addListener ( child) {
-      this.listeners = addToArray(this.listeners, child);
-      return this;
-}
 
 var classFunctions = {};
 
@@ -160,7 +132,7 @@ function newDataSource ( name , sourceType, attributes, DataSources) {
             }
          };
      
-
+         source.DataSources = DataSources;
          DataSources[name] = source;
  
 	 return source;
@@ -457,7 +429,7 @@ var dataTag = {
 
                priority:  4
              },
-  //           guiActionOnGuiElements
+  // guiActionOnGuiElements
         GUIACTION : { 
                  bind : function(DataSources) {
               	   
@@ -657,9 +629,171 @@ var dataTag = {
                    configure : function() {},
                    updateData: function() {},
                    getName : getName,
-
                    priority:  5
-           }
+           },
+           RSET :   { 
+	           getValue : function () {
+	        	   var c = this.attributes['constant'];
+	        	   this.name = this.attributes['name'];
+	        	   
+	        	   if (c == undefined) {
+	        		   return this.DataSources[this.attributes['var']].value;
+	        	   }
+	        	   return c;
+	           },
+               bind : function(DataSources) {
+            	   this.status = 'valid';
+               }, 
+               refresh : function() {}, 
+               configure : function() {},
+               updateData: function() {},
+               getName : getName,
+               isStepper() {
+            	   return false;
+               },
+               priority:  5
+       },
+           RULES: { 
+               bind : function(DataSources) {
+            	   
+            	   var onOk = function ( rules) {
+            		   this.rules = rules;
+            		   DataSources.rules = this;
+            		   rules.addListener(this);
+            		   this.clear();
+            		   this.status = 'valid';
+            	   }
+            	   
+            	   JanusRules.loadRulePage(this.rulesName, onOk.bind(this));
+            	   
+            	   
+               }, 
+               refresh : function() {
+            	   
+            	   if (this.rules) {
+            		   var values = {};
+            		   if (this.childs != undefined) {
+            			   for (var i=0;i < this.childs.length;i++) {
+            				   var v = this.childs[i];
+            				   if (!v.isStepper()) {
+            				      var value = v.getValue();
+            				      var name = v.getName();
+              		              values[name] = value;
+            				   }
+            			   };
+            		   }
+            		   this.rules.check(values);
+            		   this.showError();
+            	 	 }
+              	 
+               }, 
+               clear : function() {
+            	   this.currentRule = { rule: undefined, field: undefined, index:0 };
+               },
+               hasError : function (rule) {
+            	   if (this.currentRule.rule) {
+            		   var currentIndex = this.currentRule.index;
+            		   var ruleIndex = this.stepper.getPositionIndex(rule.currentPosition);
+					   if (ruleIndex < currentIndex 
+							   || ( ruleIndex == currentIndex && this.currentRule.priority >= rule.priority)) {
+						   this.currentRule.rule = rule;
+						   this.currentRule.index = this.stepper.getPositionIndex(rule.currentPosition);
+						   this.currentRule.field = this.fields[rule.currentPosition];
+					   }
+            		   
+            	   } else {
+            		   this.currentRule.rule = rule;
+            		   this.currentRule.index = this.stepper.getPositionIndex(rule.currentPosition);
+            		   this.currentRule.field = this.fields[rule.currentPosition];
+            	   }
+               },
+               
+               searchInputField : function ( modelName) {
+            	  var dataElement = this.DataSources[modelName];
+                  var propertyNames = Object.getOwnPropertyNames(allGuiElements);
+                  for (var i = 0; i < propertyNames.length; i++){
+              	    var name = propertyNames[i];
+              	    var guiElement = allGuiElements[name];
+              	    var modelElement = guiElement.getModelElement();
+              	    if (dataElement === modelElement) {
+              		   var ip = document.getElementById('ip' + guiElement.id);
+              		   if (ip) {
+              			   return ip;
+              		   }
+              		   return document.getElementById(guiElement.id);
+              		}
+                  }
+                  return undefined;
+               },
+               showError: function () {
+            	   if (this.currentRule.rule) {
+            		   this.currentRule.rule.selected();
+            		   var ipField = this.searchInputField(this.currentRule.field);
+            		   if (ipField) {
+            			   if (this.currentRule.rule.showMessage()) {
+            				   
+            				   document.getElementById('errorText').innerHTML = this.currentRule.rule.message;
+            				   showMetroDialog('#errorDialog');
+            				   document.getElementById('errorButton').focus();
+            				              				   
+            				  
+            			   }
+            			   JanusJS.setNextField(ipField);
+            		   }
+            	   }
+            	   this.clear();
+               },
+               configure : function() {
+            	   this.fields = {};
+            	   if (this.childs != undefined) {
+                	   for (var i=0;i < this.childs.length;i++) {
+                		 var v = this.childs[i];
+                		 if (v.isStepper()) {
+                			 this.stepper = v;
+                		 } else {
+                			 this.fields[v.attributes.name] = v.attributes.var;
+                	     }
+                	   };
+                   }
+            	   this.rulesName = this.attributes['name'];
+            	   
+               },
+               updateData: function() {},
+               getName : getName,
+
+               priority:  10
+             },
+             STEPPER: {
+            	 isStepper() {
+              	   return true;
+                 },
+            	 getValue : function () {
+            		 return this;
+  	        	 },
+                 bind : function(DataSources) {
+                	 this.status = 'valid';
+                 }, 
+                 refresh : function() {},
+                 
+                 getPositionIndex : function (fieldName) {
+                	 return this.priority[fieldName]+1;
+                 },
+                 configure : function() {
+                	 
+                	 this.fieldList = this.attributes['fields'].split(/ *, */);
+                	 this.priority = {};
+                	 
+                	 for(var i=0;i<this.fieldList.length;i++) {
+                		 var field = this.fieldList[i];
+                		 this.priority[field] = i;
+                	 };
+                	 
+                 },
+                 updateData: function() {},
+                 getName : getName,
+
+                 priority:  10
+               }
 }
 
 function newDataElementFromDOM ( element , prefix, DataSources) {
@@ -879,7 +1013,7 @@ guiTag.DIALOG.fill  = startChildEndFill;
 guiTag.DIALOG.configure  = doNothing;
 
 
-guiTag.TEXTFIELD = newGuiTag("TEXTFIELD", { TEXTFIELD: "<div  id='${id}' class='input-control text'  ${styleOut}  ><input type='text' name='${model}' value='${value}' onchange=\"JanusJS.setModelElementValue('${id}',this.value);return true;\"  /></div>" });
+guiTag.TEXTFIELD = newGuiTag("TEXTFIELD", { TEXTFIELD: "<div  id='${id}' class='input-control text'  ${styleOut}  ><input type='text'  id='ip${id}' name='${model}' value='${value}' onchange=\"JanusJS.setModelElementValue('${id}',this.value);return true;\"  /></div>" });
 guiTag.TEXTFIELD.fill = simpleFill;
 guiTag.TEXTFIELD.configure  = doNothing;
 
@@ -1144,16 +1278,6 @@ function newGuiElement ( proto , attributes, DataSources) {
              return guiElement; 
 }
 
-function convertToAttributeHash( domAttributes) {
-         var attributes = {};
-         if (domAttributes != undefined) {
-           for (var i=0;i < domAttributes.length;i++) {
-              var a = domAttributes.item(i); 
-              attributes[a.name ] = a.value;
-           }
-         }
-         return attributes;
-}
 
 
 function newGuiElementFromDOM ( element ,  DataSources) {
@@ -1291,8 +1415,12 @@ return {
 	},
 	
 	setModelElementValue : function ( divID, value ) {
-		this.getModelElementFromDivID(divID).setValue(value);
+		var modelElement = this.getModelElementFromDivID(divID);
+		modelElement.setValue(value);
 		this.updateGui(true);
+		if (modelElement.DataSources && modelElement.DataSources.rules) {
+			modelElement.DataSources.rules.refresh();
+		}
 		return false;
 	},
 	
@@ -1303,6 +1431,16 @@ return {
 			return true;
 		}
 		return true;
+	},
+	
+	focusNextField : function() {
+		if (this.nextField) {
+			this.nextField.focus();
+		}
+	},
+	
+	setNextField : function(field) {
+		this.nextField = field;
 	}
 
 	
