@@ -1,0 +1,187 @@
+<DIALOG>
+	<STRING name='versichertenName' default='' />
+	<STRING name='versichertenVorname' default='' />
+	<STRING name='geburtsdatum' default='' />
+	<STRING name='kasse' default='' />
+	<STRING name='versichertenNummer' default='' />
+	<STRING name='versichertenStatus' default='' />
+	<STRING name='betriebsstaette' default='' />
+	<STRING name='arztnummer' default='' />
+	<STRING name='ausstellungsdatum' default='' />
+	<STRING name='apotheke' default='' />
+	<STRING name='zuzahlung' default='' />
+	<STRING name='brutto' default='' />
+
+	<STRING name='bvg' default='' />
+	<STRING name='hilfsmittel' default='' />
+	<STRING name='impfstoff' default='' />
+	<STRING name='sprechstundenbedarf' default='' />
+	<STRING name='pflicht' default='' />
+
+	<STRING name='gebuerenfrei' default='' />
+	<STRING name='gebuehrenpflichtig' default='' />
+	<STRING name='noctu' default='' />
+	<STRING name='sonstige' default='' />
+	<STRING name='unfall' default='' />
+	<STRING name='arbeitsunfall' default='' />
+
+	<STRING name='abgabedatum' default='' />
+	<STRING name='unfalltag' default='' />
+	<STRING name='arbeitgeber' default='' />
+
+	<STRING name='verordnung1' default='' />
+	<STRING name='faktor1' default='' />
+	<STRING name='taxe1' default='' />
+	<STRING name='autidem1' default='' />
+
+	<STRING name='verordnung2' default='' />
+	<STRING name='faktor2' default='' />
+	<STRING name='taxe2' default='' />
+	<STRING name='autidem2' default='' />
+
+	<STRING name='verordnung3' default='' />
+	<STRING name='faktor3' default='' />
+	<STRING name='taxe3' default='' />
+	<STRING name='autidem3' default='' />
+
+	<STRING name='speichern' default='' />
+
+
+
+
+	<RULES name="rezepte">
+		<RSET name='versichertenName' var='versichertenName' />
+		<RSET name='versichertenVorname' var='versichertenVorname' />
+		<RSET name='geburtsdatum' var='geburtsdatum' />
+		<RSET name='kasse' default='' var='kasse' />
+		<RSET name='versichertenNummer' var='versichertenNummer' />
+		<RSET name='versichertenStatus' var='versichertenStatus' />
+		<RSET name='betriebsstaette' var='betriebsstaette' />
+		<RSET name='arztnummer' var='arztnummer' />
+		<RSET name='ausstellungsdatum' var='ausstellungsdatum' />
+		<RSET name='apotheke' var='apotheke' />
+		<RSET name='zuzahlung' var='zuzahlung' />
+		<RSET name='brutto' var='brutto' />
+
+		<RSET name='gesamtZuzahlung' var='zuzahlung' />
+		<RSET name='gesamtBrutto' var='brutto' />
+
+		<RSET name='bvg' var='bvg' />
+		<RSET name='hilfsmittel' var='hilfsmittel' />
+		<RSET name='impfstoff' var='impfstoff' />
+		<RSET name='sprechstundenbedarf' var='sprechstundenbedarf' />
+		<RSET name='pflicht' var='pflicht' />
+
+		<RSET name='gebuerenfrei' var='gebuerenfrei' />
+		<RSET name='gebuehrenpflichtig' var='gebuehrenpflichtig' />
+		<RSET name='noctu' var='noctu' />
+		<RSET name='sonstige' var='sonstige' />
+		<RSET name='unfall' var='unfall' />
+		<RSET name='arbeitsunfall' var='arbeitsunfall' />
+
+		<RSET name='abgabedatum' var='abgabedatum' />
+		<RSET name='unfalltag' var='unfalltag' />
+		<RSET name='arbeitgeber' var='arbeitgeber' />
+
+		<RSET name='verordnung1' var='verordnung1' />
+		<RSET name='faktor1' var='faktor1' />
+		<RSET name='taxe1' var='taxe1' />
+		<RSET name='autidem1' var='autidem1' />
+
+		<RSET name='verordnung2' var='verordnung2' />
+		<RSET name='faktor2' var='faktor2' />
+		<RSET name='taxe2' var='taxe2' />
+		<RSET name='autidem2' var='autidem2' />
+
+		<RSET name='verordnung3' var='verordnung3' />
+		<RSET name='faktor3' var='faktor3' />
+		<RSET name='taxe3' var='taxe3' />
+		<RSET name='autidem3' var='autidem3' />
+		<RSET name='speichern' var='speichern' />
+
+		<STEPPER
+			fields="versichertenName,versichertenVorname,geburtsdatum,kasse,versichertenNummer,versichertenStatus,betriebsstaette,arztnummer,ausstellungsdatum,abgabedatum,apotheke,zuzahlung,brutto,verordnung1,faktor1,taxe1,autidem1,verordnung2,faktor2,taxe2,autidem2,verordnung3,faktor3,taxe3,autidem3,gesamtZuzahlung,gesamtBrutto,speichern" />
+
+	</RULES>
+
+	<VBOX>
+		<HBOX>
+			<VBOX>
+				<CHECKBOX model='gebuerenfrei' title='' />
+				<CHECKBOX model='gebuehrenpflichtig' title='' />
+				<CHECKBOX model='noctu' title='' />
+				<CHECKBOX model='sonstige' title='' />
+				<CHECKBOX model='unfall' title='' />
+				<CHECKBOX model='arbeitsunfall' title='' />
+			</VBOX>
+			<VBOX>
+				<HBOX>
+					<VBOX>
+						<TEXTFIELD model='versichertenName' />
+						<TEXTFIELD model='versichertenVorname' />
+					</VBOX>
+					<DATEFIELD model='geburtsdatum' />
+				</HBOX>
+				<HBOX>
+					<INTEGERFIELD model='kasse' />
+					<TEXTFIELD model='versichertenNummer' />
+					<TEXTFIELD model='versichertenStatus' />
+				</HBOX>
+
+				<HBOX>
+					<INTEGERFIELD model='betriebsstaette' />
+					<INTEGERFIELD model='arztnummer' />
+					<DATEFIELD model='ausstellungsdatum' />
+				</HBOX>
+
+				<HBOX>
+					<DATEFIELD model='abgabedatum' />
+				</HBOX>
+				<HBOX>
+					<DATEFIELD model='unfalltag' />
+					<TEXTFIELD model='arbeitgeber' />
+				</HBOX>
+			</VBOX>
+			<VBOX>
+				<HBOX>
+					<CHECKBOX model='bvg' title='BVG' />
+					<CHECKBOX model='hilfsmittel' title='7' />
+					<CHECKBOX model='impfstoff' title='8' />
+					<CHECKBOX model='sprechstundenbedarf' title='9' />
+					<CHECKBOX model='pflicht' title='pfl.' />
+					<INTEGERFIELD model='apotheke' />
+				</HBOX>
+
+
+				<HBOX>
+					<MONEYFIELD model='zuzahlung' />
+					<MONEYFIELD model='brutto' />
+				</HBOX>
+
+				<HBOX>
+					<TEXTFIELD model='verordnung1' />
+					<INTEGERFIELD model='faktor1' />
+					<MONEYFIELD model='taxe1' />
+					<CHECKBOX model='autidem1' title='' />
+				</HBOX>
+
+				<HBOX>
+					<TEXTFIELD model='verordnung2' />
+					<INTEGERFIELD model='faktor2' />
+					<MONEYFIELD model='taxe2' />
+					<CHECKBOX model='autidem2' title='' />
+				</HBOX>
+				<HBOX>
+					<TEXTFIELD model='verordnung3' />
+					<INTEGERFIELD model='faktor3' />
+					<MONEYFIELD model='taxe3' />
+					<CHECKBOX model='autidem3' title='' />
+				</HBOX>
+				<HBOX>
+					<BUTTON model='speichern' title='Speichern' />
+				</HBOX>
+			</VBOX>
+
+		</HBOX>
+	</VBOX>
+</DIALOG>

@@ -8,6 +8,7 @@
 		<CALL name='listenAuswahl' command='listenAuswahl' />
 		<CALL name='actions' command='actions' />
 		<CALL name='rules' command='rules' />
+		<CALL name='rezepte' command='rezepte' />
 	</BEAN>
 	<BEAN name='menuBean2' class='spaetLaden'>
 		<CALL name='fehler1' command='seiteMitFehler1' />
@@ -20,6 +21,7 @@
 			<MENUITEM title='Tabulatoren' model='tabs' />
 			<MENUITEM title='Aktionen' model='actions' />
 			<MENUITEM title='Regeln' model='rules' />
+			<MENUITEM title='Rezepte' model='rezepte' />
 		</MENU>
 		<MENU title='Abhängigkeiten'>
 			<MENUITEM title='Updates' model='textfieldUpdates' />

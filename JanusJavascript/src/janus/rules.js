@@ -1,23 +1,30 @@
 var JanusRules = (function() {
 
-
-
-	
 	var ruleFunctions = {};
 
 	function callRuleFunction(name, command, values, callOnOk, callOnError) {
 		return (ruleFunctions[name])(command, values, callOnOk, callOnError);
 	}
+	
+	function addListenerToChilds( parent, listener) {
+		parent.addListener(listener);
+		if (parent.childs) {
+			for (var i = 0; i < parent.childs.length; i++) {
+				addListenerToChilds(parent.childs[i],listener);
+			}
+		}
+	}
 
 	var dialogValue = {}
 
-	var rukeTag = {
+	var ruleTag = {
 
 		RULES : {
 			bind : function() {
 				if (this.childs) {
 					for (var i = 0; i < this.childs.length; i++) {
-						this.childs[i].addListener(this);
+						addListenerToChilds(this.childs[i],this);
+						this.childs[i].bind();
 					}
 				}
 			},
@@ -26,30 +33,50 @@ var JanusRules = (function() {
 			check : function(values) {
 				this.forAllChilds("check", values);
 			},
-			hasError : function( rule ) {
+			hasError : function(rule) {
 				this.fireError(rule);
 			}
-			
+
 		},
 
 		REGEXP : {
 			bind : function() {
+				if (this.childs) {
+					for (var i = 0; i < this.childs.length; i++) {
+						var child = this.childs[i];
+						if (child.isTrue) {
+							this.trueChilds = child;
+						}
+						if (child.isFalse) {
+							this.falseChilds = child;
+						}
+						child.bind();
+					}
+				}
 			},
 			configure : function() {
 				this.varname = this.attributes['at'];
+				this.negate = (this.attributes['negate'] == 'true');
 				this.regexp = new RegExp(this.attributes['re']);
-				this.status = 'valid';
 			},
 			isOk : function(values) {
-				return this.regexp.test(values[this.varname]);
+				var ok = this.regexp.test(values[this.varname]);
+				if (this.negate) {
+					ok = !ok;
+				}
+				return ok;
 			},
 			check : function(values) {
 				var ok = this.isOk(values);
 				if (this.childs) {
 					if (ok) {
-						this.childs[0].forAllChilds("check", values);
+						if (this.trueChilds) {
+							this.trueChilds.checkChilds(values);
+						}
 					} else {
-						this.childs[1].forAllChilds("check", values);
+						if (this.falseChilds) {
+							this.falseChilds.checkChilds(values);
+						}
 					}
 				} else {
 					if (!ok) {
@@ -58,24 +85,81 @@ var JanusRules = (function() {
 				}
 			}
 		},
+		AND : {
+			bind : function() {
+				if (this.childs) {
+					for (var i = 0; i < this.childs.length; i++) {
+						this.childs[i].bind();
+					}
+				}
+			},
+			configure : function() {
+			},
+			isOk : function(values) {
+				if (this.childs) {
+					for (var i = 0; i < this.childs.length; i++) {
+						var ok = this.childs[i].isOk(values);
+						if (!ok) {
+							return false;
+						}
+					}
+					return true;
+				}
+				return false;
+			},
+			check : function(values) {
+				this.checkChilds(values);
+			}
+		},
+
+		OR : {
+			bind : function() {
+				if (this.childs) {
+					for (var i = 0; i < this.childs.length; i++) {
+						this.childs[i].bind();
+					}
+				}
+			},
+			configure : function() {
+			},
+			isOk : function(values) {
+				if (this.childs) {
+					for (var i = 0; i < this.childs.length; i++) {
+						var ok = this.childs[i].isOk(values);
+						if (ok) {
+							return true;
+						}
+					}
+				}
+				return false;
+			},
+			check : function(values) {
+				this.checkChilds(values);
+			}
+		},
 
 		MOVE : {
 			bind : function() {
 			},
 			configure : function() {
-				this.status = 'valid';
 			},
 			isOk : function(values) {
 				return true;
 			},
 			check : function(values) {
-				if (!this, alreadyCalled) {
-					this.fireError();
+				if (!this.alreadyCalled) {
+					this.fireError(this);
 				}
 			}
 		}
 
 	}
+
+	ruleTag.TRUE = Object.create(ruleTag.AND);
+	ruleTag.TRUE.isTrue = true;
+
+	ruleTag.FALSE = Object.create(ruleTag.AND);
+	ruleTag.FALSE.isFalse = true;
 
 	function newRule(name, sourceType, attributes) {
 		var source = Object.create(sourceType);
@@ -85,15 +169,30 @@ var JanusRules = (function() {
 		source.addChild = addChild;
 		source.addListener = addListener;
 		source.doUpdate = true;
-		source.priority = attributes['priority'];
-		source.message = attributes['message'];
 		source.alreadyCalled = false;
+		source.priority = attributes['priority'];
+		if (!source.priority) {
+			source.priority = 1;
+		}
+		source.message = attributes['message'];
+		if (!source.message) {
+			source.message = source.name;
+		}
 		source.positions = [];
 		var ptext = source.attributes['move'];
 		if (ptext) {
 			source.positions = ptext.split(/ *, */);
 			source.positionIndex = 0;
 			source.currentPosition = source.positions[0];
+		}
+
+		source.checkChilds = function(values)
+		{
+			if (this.childs) {
+				for (var i = 0; i < this.childs.length; i++) {
+						this.childs[i].check(values);
+				}
+			}
 		}
 
 		source.forAllChilds = function(whatToDo, accumulator) {
@@ -135,7 +234,7 @@ var JanusRules = (function() {
 			this.nextPosition();
 		}
 
-		source.fireError = function( rule) {
+		source.fireError = function(rule) {
 			if (this.listeners == undefined) {
 				return;
 			}
@@ -152,7 +251,7 @@ var JanusRules = (function() {
 
 	function newRuleElementFromDOM(element, prefix) {
 		if (element.nodeType == 1) {
-			var proto = rukeTag[element.nodeName];
+			var proto = ruleTag[element.nodeName];
 			if (proto != undefined) {
 				var attributes = convertToAttributeHash(element.attributes);
 				var name = attributes['name'];
@@ -172,12 +271,10 @@ var JanusRules = (function() {
 		return undefined;
 	}
 
-
 	function buildRulePage(element) {
 		if (element.nodeType == 1) {
-		
 
-			var ruleElement= newRuleElementFromDOM(element);
+			var ruleElement = newRuleElementFromDOM(element);
 
 			ruleElement.data = {};
 			ruleElement.data.addChild = addChild;
@@ -198,44 +295,41 @@ var JanusRules = (function() {
 	}
 
 	return {
-		prepareRulePage : function (text) {
+		prepareRulePage : function(text) {
 			parser = new DOMParser();
 			xmlDoc = parser.parseFromString(text, "text/xml");
-			
+
 			if (xmlDoc.documentElement.innerHTML) {
 				if (xmlDoc.documentElement.innerHTML.toString().indexOf(
-				'parsererror') > 0) {
+						'parsererror') > 0) {
 					JanusJS.addError(xmlDoc.documentElement.innerHTML);
 					return undefined;
 				}
 			}
-			
+
 			var page = buildRulePage(xmlDoc.documentElement);
 			return page;
 		},
 
 		loadRulePage : function(name, onOk) {
 			jQuery.ajax({
-						url : 'rules/' + name + '.xml',
-						data : '',
-						success : function(data) {
-							try {
-								var page = JanusRules.prepareRulePage(data);
-								onOk(page);
-							} catch (e) {
-								JanusJS
-										.addError(' Die Seite '
-												+ this.url
-												+ ' kann nicht initialisiert werden<br>'
-												+ e);
-							}
-						},
-						error : function(xhr, ajaxOptions, thrownError) {
-							JanusJS.addError(' Die Seite ' + this.url
-									+ ' konnte nicht geladen werden');
-						},
-						dataType : 'text'
-					});
+				url : 'rules/' + name + '.xml',
+				data : '',
+				success : function(data) {
+					try {
+						var page = JanusRules.prepareRulePage(data);
+						onOk(page);
+					} catch (e) {
+						JanusJS.addError(' Die Seite ' + this.url
+								+ ' kann nicht initialisiert werden<br>' + e);
+					}
+				},
+				error : function(xhr, ajaxOptions, thrownError) {
+					JanusJS.addError(' Die Seite ' + this.url
+							+ ' konnte nicht geladen werden');
+				},
+				dataType : 'text'
+			});
 		},
 
 		addRuleFunction : function(name, f) {

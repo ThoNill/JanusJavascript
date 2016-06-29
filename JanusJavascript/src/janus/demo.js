@@ -4,7 +4,7 @@ JanusJS.updateGui = function(ifNeeded) {
 	} else {
 		this.showResult('place', activePage.fill({}));
 	}
-	if(activePage.urtext) {
+	if (activePage.urtext) {
 		var i = activePage.urtext.toString().indexOf('&lt;VBOX&gt;');
 		if (i >= 0) {
 			this.showResult('dataResult', activePage.urtext.substr(0, i));
@@ -83,11 +83,12 @@ function preparePage(text) {
 	parser = new DOMParser();
 	xmlDoc = parser.parseFromString(text, "text/xml");
 
-	if(xmlDoc.documentElement.innerHTML) {
+	if (xmlDoc.documentElement.innerHTML) {
 		if (xmlDoc.documentElement.innerHTML.toString().indexOf('parsererror') > 0) {
 			JanusJS.addError(xmlDoc.documentElement.innerHTML);
 			return undefined;
-		};
+		}
+		;
 	}
 
 	text = text.replace(/&/g, '&amp;');
@@ -136,7 +137,6 @@ loadXMLPage(pages, 'listen', function(page) {
 	page.DataSources.liste.doUpdate = false;
 });
 
-
 loadXMLPage(pages, 'listenAuswahl', function(page) {
 	page.DataSources.liste.refresh();
 	page.DataSources.liste.doUpdate = false;
@@ -147,20 +147,31 @@ loadXMLPage(pages, 'rules', function(page) {
 
 });
 
+loadXMLPage(pages, 'rezepte', function(page) {
+	var keys = Object.getOwnPropertyNames(page.DataSources);
+	if (keys != undefined) {
+		for (var i = 0; i < keys.length; i++) {
+			var k = keys[i];
+			var field = (page.DataSources)[k]; 
+			if (field.setValue) {
+				field.setValue("");
+			}
+		}
+	}
 
-function setClassOfDomElement( domElement, className) {
+});
+
+function setClassOfDomElement(domElement, className) {
 	domElement.className += " " + className;
 }
 
-function removeClassOfDomElement( domElement, className) {
-	var regexp = new RegExp("(?:^|\\s)" + className +"(?!\\S)");
-	domElement.className = domElement.className.replace( regexp , '' );
+function removeClassOfDomElement(domElement, className) {
+	var regexp = new RegExp("(?:^|\\s)" + className + "(?!\\S)");
+	domElement.className = domElement.className.replace(regexp, '');
 }
 
 JanusJS.addClassFunction('setClass', setClassOfDomElement)
 JanusJS.addClassFunction('removeClass', removeClassOfDomElement)
-
-
 
 function showActivePage(command, values, callIfOk, callIfError) {
 	var page = pages[command];

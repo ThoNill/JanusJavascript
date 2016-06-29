@@ -208,7 +208,11 @@ var dataTag = {
                }, 
                configure : function() {
                   this.defValue = this.attributes['default'];
+                  if (!this.defValue) {
+                	  this.defValue = "";
+                  };
                   this.status = 'valid';
+                  this.value = this.defValue;
                },
                refresh : function() {
                  this.setValue(this.defValue);
@@ -730,15 +734,14 @@ var dataTag = {
             		   this.currentRule.rule.selected();
             		   var ipField = this.searchInputField(this.currentRule.field);
             		   if (ipField) {
+            			   JanusJS.setNextField(ipField);
             			   if (this.currentRule.rule.showMessage()) {
-            				   
             				   document.getElementById('errorText').innerHTML = this.currentRule.rule.message;
             				   showMetroDialog('#errorDialog');
             				   document.getElementById('errorButton').focus();
-            				              				   
-            				  
+            			   } else {
+            				   JanusJS.focusNextField();
             			   }
-            			   JanusJS.setNextField(ipField);
             		   }
             	   }
             	   this.clear();
@@ -856,18 +859,21 @@ function replaceValues ( template, values ) {
 function addId( values) {
         var newValues = Object.create(values); 
         newValues.id = this.id;
+        newValues.value = "";
         newValues.model = this.model;
+       
         if (this.model) {
         	if (this.DataSources[this.model] == undefined) {
         		JanusJS.addError("Modelelement " + this.model + " ist nicht definiert")
         	} else {
         		var m = this.DataSources[this.model];
-        		if (m.value != undefined) {
+        		if (m) {
         			newValues.value = m.value;
         		}
         		
         	}
         }
+        
         if (this.attributes.title != undefined) {
         	newValues.title = this.attributes.title;
         }
@@ -1013,7 +1019,7 @@ guiTag.DIALOG.fill  = startChildEndFill;
 guiTag.DIALOG.configure  = doNothing;
 
 
-guiTag.TEXTFIELD = newGuiTag("TEXTFIELD", { TEXTFIELD: "<div  id='${id}' class='input-control text'  ${styleOut}  ><input type='text'  id='ip${id}' name='${model}' value='${value}' onchange=\"JanusJS.setModelElementValue('${id}',this.value);return true;\"  /></div>" });
+guiTag.TEXTFIELD = newGuiTag("TEXTFIELD", { TEXTFIELD: "<div  id='${id}' class='input-control text'  ${styleOut}  ><input type='text'  id='ip${id}' name='${model}' value='${value}' onkeypress=\"return JanusJS.setElementValueEnter(event,'${id}',this.value);\"  /></div>" });
 guiTag.TEXTFIELD.fill = simpleFill;
 guiTag.TEXTFIELD.configure  = doNothing;
 
@@ -1048,7 +1054,7 @@ guiTag.PASSWORD.configure  = doNothing;
 
 
 
-guiTag.CHECKBOX = newGuiTag("CHECKBOX", { TEXTFIELD: "<label   id='${id}'  ${styleOut}  class='input-control checkbox small-check'><input type='checkbox' name='${model}' value='${value}' /><span class='check'></span><span class='caption'>${title}</span></label>" });
+guiTag.CHECKBOX = newGuiTag("CHECKBOX", { CHECKBOX: "<label   id='${id}'  ${styleOut}  class='input-control checkbox small-check'><input type='checkbox' name='${model}' value='${value}' /><span class='check'></span><span class='caption'>${title}</span></label>" });
 guiTag.CHECKBOX.fill = simpleFill;
 guiTag.CHECKBOX.configure  = doNothing;
 
@@ -1416,10 +1422,14 @@ return {
 	
 	setModelElementValue : function ( divID, value ) {
 		var modelElement = this.getModelElementFromDivID(divID);
-		modelElement.setValue(value);
-		this.updateGui(true);
-		if (modelElement.DataSources && modelElement.DataSources.rules) {
-			modelElement.DataSources.rules.refresh();
+		if (modelElement && modelElement.setValue) {
+			modelElement.setValue(value);
+			this.updateGui(true);
+			if (modelElement.DataSources && modelElement.DataSources.rules) {
+				modelElement.DataSources.rules.refresh();
+			}
+		} else {
+			//alert(modelElement.name);
 		}
 		return false;
 	},
