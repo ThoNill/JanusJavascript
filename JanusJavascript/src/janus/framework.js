@@ -937,6 +937,7 @@ var JanusJS = (function() {
 		newValues.id = this.id;
 		newValues.value = "";
 		newValues.model = this.model;
+		
 
 		if (this.model) {
 			if (this.DataSources[this.model] == undefined) {
@@ -964,6 +965,14 @@ var JanusJS = (function() {
 		}
 
 		newValues.styleOut = ' style=\"' + newValues.innerStyle + '\" ';
+		
+		newValues.startTooltip = "";
+		newValues.endTooltip = "";
+		
+		if (this.attributes.tooltip) {
+				newValues.startTooltip = "<div data-role='hint' data-hint='" + this.attributes.tooltip + "'>";
+				newValues.endTooltip = "</div>";
+		}
 
 		return newValues;
 	}
@@ -1135,13 +1144,14 @@ var JanusJS = (function() {
 	guiTag.TEXTFIELD = newGuiTag(
 			"TEXTFIELD",
 			{
-				TEXTFIELD : "<div  id='${id}' class='input-control text'  ${styleOut}  ><input type='text'  id='ip${id}' name='${model}' value='${value}' onkeypress=\"return JanusJS.setElementValueEnter(event,'${id}',this.value);\"  /></div>"
+				TEXTFIELD : "<div  id='${id}' " +
+						"class='input-control text  margin10 no-margin-right '  ${styleOut} >${startTooltip}<input type='text'  id='ip${id}' name='${model}' value='${value}' onkeypress=\"return JanusJS.setElementValueEnter(event,'${id}',this.value);\"  />${endTooltip}</div>"
 			});
 	guiTag.TEXTFIELD.fill = simpleFill;
 	guiTag.TEXTFIELD.configure = doNothing;
 
 	guiTag.LABEL = newGuiTag("LABEL", {
-		LABEL : "<div  id='${id}'  ${styleOut} >${title}</div>"
+		LABEL : "<div  id='${id}' class='margin10 no-margin-right ' ${styleOut} >${title}</div>"
 	});
 	guiTag.LABEL.fill = simpleFill;
 	guiTag.LABEL.configure = function() {
@@ -1151,7 +1161,7 @@ var JanusJS = (function() {
 	guiTag.BUTTON = newGuiTag(
 			"BUTTON",
 			{
-				BUTTON : "<input  id='${id}'  ${styleOut}  type='button' value='${title}' name='${model}' onClick='JanusJS.getModelElementFromDivID(\"${id}\").refresh();return false;' />"
+				BUTTON : "<div class='margin10 no-margin-right' ><input  id='${id}'  ${styleOut}  type='button' value='${title}' name='${model}' onClick='JanusJS.getModelElementFromDivID(\"${id}\").refresh();return false;' /></div>"
 			});
 	guiTag.BUTTON.fill = simpleFill;
 	guiTag.BUTTON.configure = doNothing;
@@ -1159,7 +1169,7 @@ var JanusJS = (function() {
 	guiTag.DATEFIELD = newGuiTag(
 			"DATEFIELD",
 			{
-				DATEFIELD : "<input   id='${id}'  ${styleOut}  class='input-control text' type='date' name='${model}' value='${value}' onkeypress=\"return JanusJS.setElementValueEnter(event,'${id}',this.value);\" />"
+				DATEFIELD : "<div  id='${id}' ${styleOut} >${startTooltip}<input   id='ip${id}' ${styleOut}  class='input-control text margin10 no-margin-right ' type='date' name='${model}' value='${value}' onkeypress=\"return JanusJS.setElementValueEnter(event,'${id}',this.value);\" />${endTooltip}</div>"
 			});
 	guiTag.DATEFIELD.fill = simpleFill;
 	guiTag.DATEFIELD.configure = doNothing;
@@ -1167,7 +1177,7 @@ var JanusJS = (function() {
 	guiTag.MONEYFIELD = newGuiTag(
 			"MONEYFIELD",
 			{
-				MONEYFIELD : "<input   id='${id}'  ${styleOut} class='input-control text' type='number' name='${model}' value='${value}' onkeypress=\"return JanusJS.setElementValueEnter(event,'${id}',this.value);\"  />"
+				MONEYFIELD : "<div  id='${id}' ${styleOut} >${startTooltip}<input   id='ip${id}' ${styleOut} class='input-control text margin10 no-margin-right ' type='number' name='${model}' value='${value}' onkeypress=\"return JanusJS.setElementValueEnter(event,'${id}',this.value);\"  />${endTooltip}</div>"
 			});
 	guiTag.MONEYFIELD.fill = simpleFill;
 	guiTag.MONEYFIELD.configure = doNothing;
@@ -1175,7 +1185,7 @@ var JanusJS = (function() {
 	guiTag.INTEGERFIELD = newGuiTag(
 			"INTEGERFIELD",
 			{
-				INTEGERFIELD : "<input   id='${id}'  ${styleOut} class='input-control text' type='number' pattern='^[0-9]+$' name='${model}' value='${value}' onkeypress=\"return JanusJS.setElementValueEnter(event,'${id}',this.value);\" />"
+				INTEGERFIELD : "<div  id='${id}' ${styleOut} >${startTooltip}<input   id='ip${id}' ${styleOut} class='input-control text margin10 no-margin-right ' type='number' pattern='^[0-9]+$' name='${model}' value='${value}' onkeypress=\"return JanusJS.setElementValueEnter(event,'${id}',this.value);\" />${endTooltip}</div>"
 			});
 	guiTag.INTEGERFIELD.fill = simpleFill;
 	guiTag.INTEGERFIELD.configure = doNothing;
@@ -1183,7 +1193,7 @@ var JanusJS = (function() {
 	guiTag.PASSWORD = newGuiTag(
 			"PASSWORD",
 			{
-				PASSWORD : "<input   id='${id}'   ${styleOut}  class='input-control password' type='password' name='${model}' value='${value}' onkeypress=\"return JanusJS.setElementValueEnter(event,'${id}',this.value);\" />"
+				PASSWORD : "<div  id='${id}' ${styleOut} >${startTooltip}<input   id='ip${id}'   ${styleOut}  class='input-control password margin10 no-margin-right ' type='password' name='${model}' value='${value}' onkeypress=\"return JanusJS.setElementValueEnter(event,'${id}',this.value);\" />${endTooltip}</div>"
 			});
 	guiTag.PASSWORD.fill = simpleFill;
 	guiTag.PASSWORD.configure = doNothing;
@@ -1191,33 +1201,47 @@ var JanusJS = (function() {
 	guiTag.CHECKBOX = newGuiTag(
 			"CHECKBOX",
 			{
-				CHECKBOX : "<label   id='${id}'  ${styleOut}  class='input-control checkbox small-check'><input type='checkbox' name='${model}' value='${value}' /><span class='check'></span><span class='caption'>${title}</span></label>"
+				CHECKBOX : "<label   id='${id}'  ${styleOut}  class='input-control checkbox small-check margin10 no-margin-right '>${startTooltip}<input type='checkbox' name='${model}' value='${value}' /><span class='check'></span><span class='caption'>${title}</span>${endTooltip}</label>"
 			});
 	guiTag.CHECKBOX.fill = simpleFill;
 	guiTag.CHECKBOX.configure = doNothing;
-
+/*
 	guiTag.VBOX = newGuiTag("VBOX", {
 		start : "<TABLE id='${id}'  ${styleOut}  >",
 		child : "<TR><TD>${child}</TD></TR>",
 		end : "</TABLE>"
 	});
+	*/
+	guiTag.VBOX = newGuiTag("VBOX", {
+		start : "<DIV id='${id}' class='vbox margin10 no-margin-right no-margin-left' ${styleOut}  >",
+		child : "<DIV>${child}</DIV>",
+		end : "</DIV>"
+	});
+
 	guiTag.VBOX.fill = startChildEndFill;
 	guiTag.VBOX.configure = doNothing;
 
-	guiTag.HBOX = newGuiTag(
+/*	guiTag.HBOX = newGuiTag(
 			"HBOX",
 			{
 				start : "<TABLE  id='${id}'  ${styleOut} ><TR>",
 				child : "<TD ><div class='margin10 no-margin-right'>${child}</div></TD>",
 				end : "</TR></TABLE>"
 			});
+*/
+	guiTag.HBOX = newGuiTag("HBOX", {
+		start : "<DIV id='${id}' class='hbox' ${styleOut}  >",
+		child : "<DIV>${child}</DIV>",
+		end : "</DIV>"
+	});
+
 	guiTag.HBOX.fill = startChildEndFill;
 	guiTag.HBOX.configure = doNothing;
 
 	guiTag.SHOWTABLE = newGuiTag(
 			"SHOWTABLE",
 			{
-				start : "<TABLE  id='${id}' class='table striped hovered border bordered' ${styleOut}  ><THEAD>",
+				start : "<TABLE  id='${id}' class='table striped hovered border bordered margin10 no-margin-right' ${styleOut}  ><THEAD>",
 				headerStart : "<TR><TD> </TD>",
 				header : "<TH>${header}</TH>",
 				headerEnd : "</TR></THEAD><TBODY>",
@@ -1244,10 +1268,10 @@ var JanusJS = (function() {
 	guiTag.COMBO = newGuiTag(
 			"COMBO",
 			{
-				start : "<div  id='${id}' class='input-control select'  ${styleOut}   ><select name='${model}' onchange=\"JanusJS.setCurrentRow('${id}',this.selectedIndex);return true;\" >",
+				start : "<div  id='${id}' class='input-control select'  ${styleOut}   >${startTooltip}<select name='${model}' onchange=\"JanusJS.setCurrentRow('${id}',this.selectedIndex);return true;\" >",
 				row : "<option value='${row}' >${text}</option>",
 				rowSelected : "<option value='${row}' selected >${text}</option>",
-				end : "</select></div>"
+				end : "</select>${endTooltip}</div>"
 			});
 	guiTag.COMBO.fill = fillRowsFromList;
 	guiTag.COMBO.configure = doNothing;
@@ -1256,11 +1280,11 @@ var JanusJS = (function() {
 			"RADIO",
 			{
 				start : "",
-				row : " <label  id='${id}' class='input-control radio small-check'  ${styleOut} > <input type='radio' name='${model}' value='${row}' onchange=\"return JanusJS.setCurrentRow('${id}',this.value);\" > <span class='check'></span><span class='caption'>${text}</span></label>",
+				row : " <label  id='${id}' class='input-control radio small-check'  ${styleOut} >${startTooltip} <input type='radio' name='${model}' value='${row}' onchange=\"return JanusJS.setCurrentRow('${id}',this.value);\" > <span class='check'></span><span class='caption'>${text}</span>${endTooltip}</label>",
 				// rowSelected: "<input type='radio' name='${model}'
 				// value='${row}' checked
 				// >${text}<br/>",
-				rowSelected : " <label  id='${id}'  class='input-control radio small-check'  ${styleOut} > <input type='radio' name='${model}' checked value='${row}' onchange=\"return JanusJS.setCurrentRow('${id}',this.value);\" > <span class='check'></span><span class='caption'>${text}</span></label>",
+				rowSelected : " <label  id='${id}'  class='input-control radio small-check'  ${styleOut} >${startTooltip}<input type='radio' name='${model}' checked value='${row}' onchange=\"return JanusJS.setCurrentRow('${id}',this.value);\" > <span class='check'></span><span class='caption'>${text}</span>${endTooltip}</label>",
 
 				end : ""
 			});
@@ -1280,10 +1304,10 @@ var JanusJS = (function() {
 				// >${text}</option>",
 				// end: "</datalist>"
 
-				start : " <div  id='${id}' class='listview set-border'  id='listValues${id}'  ${styleOut} >",
+				start : " <div  id='${id}' class='listview set-border'  id='listValues${id}'  ${styleOut} >${startTooltip}",
 				row : "<div class='list'   onClick=\"return JanusJS.setCurrentRow('${id}','${row}');\" ><span class='list-title'>${text}</span></div>",
 				rowSelected : "<div class='list block-shadow-info' onClick=\"return JanusJS.setCurrentRow('${id}','${row}');\" > </span><span class='list-title'>${text}</span></div>",
-				end : "</div>"
+				end : "${endTooltip}</div>"
 
 			});
 	guiTag.LIST.fill = fillRowsFromList;
