@@ -151,6 +151,7 @@ function showActivePage(command, values, callIfOk, callIfError) {
 		callIfOk();
 		JanusJS.updateGui();
 		if (page.DataSources.rules) {
+			page.DataSources.rules.restart();
 			page.DataSources.rules.refresh();
 		}
 	} else {
@@ -187,6 +188,7 @@ JanusJS.addClassFunction('refresh', function(action, callOnOk, callOnError) {
 
 function clearRezeptGui(page) {
 	page.callOnInit();
+	
 }
 
 loadXMLPage(pages, 'rezepte', clearRezeptGui);

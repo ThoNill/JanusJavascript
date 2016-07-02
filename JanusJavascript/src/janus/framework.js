@@ -711,6 +711,12 @@ var JanusJS = (function() {
 			priority : 5
 		},
 		RULES : {
+			restart : function(DataSources) {
+				this.maxPriority = 0;
+				this.clear();
+				this.rules.restart();
+			},
+			
 			bind : function(DataSources) {
 
 				var onOk = function(DataSources, rules) {
@@ -739,7 +745,6 @@ var JanusJS = (function() {
 								values[name] = value;
 							}
 						}
-						;
 					}
 					this.rules.check(values);
 					return this.showError();
@@ -824,7 +829,6 @@ var JanusJS = (function() {
 							this.fields[v.attributes.name] = v.attributes['var'];
 						}
 					}
-					;
 				}
 				this.rulesName = this.attributes['name'];
 

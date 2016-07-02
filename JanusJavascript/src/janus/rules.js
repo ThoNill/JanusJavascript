@@ -35,6 +35,13 @@ var JanusRules = (function() {
 			},
 			hasError : function(rule) {
 				this.fireError(rule);
+			},
+			restart : function() {
+				if (this.childs) {
+					for (var i = 0; i < this.childs.length; i++) {
+						this.childs[i].restart();
+					}
+				}
 			}
 
 		},
@@ -273,9 +280,11 @@ var JanusRules = (function() {
 			}
 		}
 
-		source.clear = function() {
-			this.allreadyCalled = false;
-			this.forAllChilds(this.clear);
+		source.restart = function() {
+			this.alreadyCalled  = false;
+			this.positionIndex = 0;
+			this.currentPosition = this.positions[this.positionIndex];
+			this.forAllChilds(this.restart);
 		}
 
 		source.nextPosition = function() {
