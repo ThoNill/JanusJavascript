@@ -44,13 +44,10 @@
 	<STRING name='taxe3' default='' />
 	<STRING name='autidem3' default='' />
 
-	<STRING name='speichern' default='' />
-
-
-
 
 	<RULES name="rezepte">
 		<RSET name='versichertenName' var='versichertenName' />
+		<RSET name='versichertenName2' var='versichertenName' />
 		<RSET name='versichertenVorname' var='versichertenVorname' />
 		<RSET name='geburtsdatum' var='geburtsdatum' />
 		<RSET name='kasse' default='' var='kasse' />
@@ -97,12 +94,59 @@
 		<RSET name='faktor3' var='faktor3' />
 		<RSET name='taxe3' var='taxe3' />
 		<RSET name='autidem3' var='autidem3' />
-		<RSET name='speichern' var='speichern' />
+		<RSET name='speichern' var='speichernClearFields' />
 
 		<STEPPER
-			fields="versichertenName,versichertenVorname,geburtsdatum,kasse,versichertenNummer,versichertenStatus,betriebsstaette,arztnummer,ausstellungsdatum,abgabedatum,apotheke,zuzahlung,brutto,verordnung1,faktor1,taxe1,autidem1,verordnung2,faktor2,taxe2,autidem2,verordnung3,faktor3,taxe3,autidem3,gesamtZuzahlung,gesamtBrutto,speichern" />
+			fields="versichertenName,versichertenVorname,geburtsdatum,kasse,versichertenNummer,versichertenName2,versichertenStatus,betriebsstaette,arztnummer,ausstellungsdatum,abgabedatum,apotheke,zuzahlung,brutto,verordnung1,faktor1,taxe1,autidem1,verordnung2,faktor2,taxe2,autidem2,verordnung3,faktor3,taxe3,autidem3,gesamtZuzahlung,gesamtBrutto,speichern" />
 
 	</RULES>
+
+<ACTION name="speichernClearFields" class='refresh' foreach="speichern,versichertenName,versichertenVorname,geburtsdatum,kasse,versichertenNummer,versichertenStatus,betriebsstaette,arztnummer,ausstellungsdatum,abgabedatum,apotheke,zuzahlung,brutto,verordnung1,faktor1,taxe1,autidem1,verordnung2,faktor2,taxe2,autidem2,verordnung3,faktor3,taxe3,autidem3" />
+
+
+	<BEAN name="speichernBean" class="rezeptSpeichern" >
+	<CALL name="speichern" command="speichern" >
+	    <SET name='versichertenName' var='versichertenName' />
+		<SET name='versichertenVorname' var='versichertenVorname' />
+		<SET name='geburtsdatum' var='geburtsdatum' />
+		<SET name='kasse' default='' var='kasse' />
+		<SET name='versichertenNummer' var='versichertenNummer' />
+		<SET name='versichertenStatus' var='versichertenStatus' />
+		<SET name='betriebsstaette' var='betriebsstaette' />
+		<SET name='arztnummer' var='arztnummer' />
+		<SET name='ausstellungsdatum' var='ausstellungsdatum' />
+		<SET name='apotheke' var='apotheke' />
+		<SET name='zuzahlung' var='zuzahlung' />
+		<SET name='brutto' var='brutto' />
+		<SET name='bvg' var='bvg' />
+		<SET name='hilfsmittel' var='hilfsmittel' />
+		<SET name='impfstoff' var='impfstoff' />
+		<SET name='sprechstundenbedarf' var='sprechstundenbedarf' />
+		<SET name='pflicht' var='pflicht' />
+		<SET name='gebuerenfrei' var='gebuerenfrei' />
+		<SET name='gebuehrenpflichtig' var='gebuehrenpflichtig' />
+		<SET name='noctu' var='noctu' />
+		<SET name='sonstige' var='sonstige' />
+		<SET name='unfall' var='unfall' />
+		<SET name='arbeitsunfall' var='arbeitsunfall' />
+		<SET name='abgabedatum' var='abgabedatum' />
+		<SET name='unfalltag' var='unfalltag' />
+		<SET name='arbeitgeber' var='arbeitgeber' />
+		<SET name='verordnung1' var='verordnung1' />
+		<SET name='faktor1' var='faktor1' />
+		<SET name='taxe1' var='taxe1' />
+		<SET name='autidem1' var='autidem1' />
+		<SET name='verordnung2' var='verordnung2' />
+		<SET name='faktor2' var='faktor2' />
+		<SET name='taxe2' var='taxe2' />
+		<SET name='autidem2' var='autidem2' />
+		<SET name='verordnung3' var='verordnung3' />
+		<SET name='faktor3' var='faktor3' />
+		<SET name='taxe3' var='taxe3' />
+		<SET name='autidem3' var='autidem3' />
+		</CALL>
+	</BEAN>
+
 
 	<VBOX>
 		<HBOX>
@@ -116,12 +160,11 @@
 			</VBOX>
 			<VBOX>
 				<HBOX>
-					<VBOX>
-						<TEXTFIELD model='versichertenName' />
-						<TEXTFIELD model='versichertenVorname' />
-					</VBOX>
+					<TEXTFIELD model='versichertenName' />
+					<TEXTFIELD model='versichertenVorname' />
 					<DATEFIELD model='geburtsdatum' />
 				</HBOX>
+
 				<HBOX>
 					<INTEGERFIELD model='kasse' />
 					<TEXTFIELD model='versichertenNummer' />
@@ -178,7 +221,7 @@
 					<CHECKBOX model='autidem3' title='' />
 				</HBOX>
 				<HBOX>
-					<BUTTON model='speichern' title='Speichern' />
+					<BUTTON model='speichernClearFields' title='Speichern' />
 				</HBOX>
 			</VBOX>
 

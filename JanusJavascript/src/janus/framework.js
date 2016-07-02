@@ -493,7 +493,15 @@ var dataTag = {
             	   
                }, 
                refresh : function(callOnOk, callOnError) {
+            	   if(this.DataSources.rules && this.DataSources.rules.maxPriority >= 3) {
+            			JanusJS.addError("Beheben Sie bitte zun&auml;chst die noch vorhandenen Fehler");
+            		   return;
+            	   }
+            	   
             	  var callTheAction = true; 
+            	  if (callOnOk == undefined) {
+            		  callOnOk = this.callListUpdate;
+            	  }
             	  if (this.ifThen) {
             		  callTheAction = this.ifThen.isOk();
                   }
@@ -503,12 +511,22 @@ var dataTag = {
                     	  this.callListe();
                       }
                   } 
-               }, 
+               },
+               callListUpdate : function() {
+            	   JanusJS.updateGui(true);
+           		if (this.DataSources.rules) {
+        			this.DataSources.rules.refresh();
+        		};
+
+    		   },
                createDanachFunction : function (dataElement,danach,callOnError) {
             	   return this.callActionFunction.bind(this,dataElement,danach,callOnError);
        		   },
                createCallListe : function(callOnOk, callOnError) {
-            	   var danach = callOnOk;
+            	   var danach = undefined;
+            	   if (callOnOk) {
+            	       danach = callOnOk.bind(this);
+            	   };
             	   for (var i= this.foreach.length-1; i >= 0;i--) {
             		   var dataElement = this.foreach[i];
             		   danach = this.createDanachFunction(dataElement,danach,callOnError);
@@ -576,6 +594,11 @@ var dataTag = {
  
                  }, 
                  refresh : function( callOnOk, callOnError) {
+                	if(this.DataSources.rules && this.DataSources.rules.maxPriority >= 3) {
+                		JanusJS.addError("Beheben Sie bitte zun&auml;chst die noch vorhandenen Fehler");
+              		   return;
+              	   }
+                	 
                 	 var values = {};
                 	 if (this.childs != undefined) {
                 	   for (var i=0;i < this.childs.length;i++) {
@@ -660,7 +683,7 @@ var dataTag = {
            RULES: { 
                bind : function(DataSources) {
             	   
-            	   var onOk = function ( rules) {
+            	   var onOk = function ( DataSources,rules) {
             		   this.rules = rules;
             		   DataSources.rules = this;
             		   rules.addListener(this);
@@ -668,13 +691,14 @@ var dataTag = {
             		   this.status = 'valid';
             	   }
             	   
-            	   JanusRules.loadRulePage(this.rulesName, onOk.bind(this));
+            	   JanusRules.loadRulePage(this.rulesName, onOk.bind(this,DataSources));
             	   
             	   
                }, 
                refresh : function() {
             	   
             	   if (this.rules) {
+            		   this.maxPriority = 0;
             		   var values = {};
             		   if (this.childs != undefined) {
             			   for (var i=0;i < this.childs.length;i++) {
@@ -687,14 +711,18 @@ var dataTag = {
             			   };
             		   }
             		   this.rules.check(values);
-            		   this.showError();
+            		   return this.showError();
             	 	 }
+            	     return true;
               	 
                }, 
                clear : function() {
-            	   this.currentRule = { rule: undefined, field: undefined, index:0 };
+            	   this.currentRule = { rule: undefined, field: undefined, index:0};
                },
                hasError : function (rule) {
+            	   if (this.maxPriority < rule.priority) {
+            		   this.maxPriority = rule.priority;
+            	   }
             	   if (this.currentRule.rule) {
             		   var currentIndex = this.currentRule.index;
             		   var ruleIndex = this.stepper.getPositionIndex(rule.currentPosition);
@@ -745,6 +773,7 @@ var dataTag = {
             		   }
             	   }
             	   this.clear();
+            	   return (this.maxPriority < 3);
                },
                configure : function() {
             	   this.fields = {};

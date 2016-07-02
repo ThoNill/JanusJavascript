@@ -147,7 +147,65 @@ loadXMLPage(pages, 'rules', function(page) {
 
 });
 
-loadXMLPage(pages, 'rezepte', function(page) {
+function setClassOfDomElement(domElement, className) {
+	domElement.className += " " + className;
+}
+
+JanusJS.addClassFunction('setClass', setClassOfDomElement);
+
+function removeClassOfDomElement(domElement, className) {
+	var regexp = new RegExp("(?:^|\\s)" + className + "(?!\\S)");
+	domElement.className = domElement.className.replace(regexp, '');
+}
+
+JanusJS.addClassFunction('removeClass', removeClassOfDomElement);
+
+function showActivePage(command, values, callIfOk, callIfError) {
+	var page = pages[command];
+	if (page) {
+		activePage = page;
+		callIfOk();
+		JanusJS.updateGui();
+		if (page.DataSources.rules) {
+			page.DataSources.rules.refresh();
+		};
+	} else {
+		callIfError('Seite kann nicht angezeigt werden');
+	}
+}
+
+JanusJS.addClassFunction('menuauswahl', showActivePage);
+
+JanusJS.addClassFunction('spaetLaden', function(command, values, callIfOk,
+		callIfError) {
+
+	loadXMLPage(pages, command, function() {
+		showActivePage(command, values, callIfOk, callIfError);
+    });
+});
+loadXMLPage(pages, 'menu', function(page) {
+	JanusJS.showResult('menu', page.fill({}));
+});
+
+
+
+JanusJS.addClassFunction('rezeptSpeichern', function(command, values, callIfOk,
+		callIfError) {
+	
+	JanusJS.addMessage("Rezept gespeichert");
+	
+});
+
+
+JanusJS.addClassFunction('refresh', function(action, callOnOk,
+		callOnError) {
+	action.refresh();
+	if (callOnOk) {
+		callOnOk();
+	}
+})
+
+function clearRezeptGui (page) {
 	var keys = Object.getOwnPropertyNames(page.DataSources);
 	if (keys != undefined) {
 		for (var i = 0; i < keys.length; i++) {
@@ -158,43 +216,7 @@ loadXMLPage(pages, 'rezepte', function(page) {
 			}
 		}
 	}
-
-});
-
-function setClassOfDomElement(domElement, className) {
-	domElement.className += " " + className;
+//	page.DataSources.rules.refresh();
 }
 
-function removeClassOfDomElement(domElement, className) {
-	var regexp = new RegExp("(?:^|\\s)" + className + "(?!\\S)");
-	domElement.className = domElement.className.replace(regexp, '');
-}
-
-JanusJS.addClassFunction('setClass', setClassOfDomElement)
-JanusJS.addClassFunction('removeClass', removeClassOfDomElement)
-
-function showActivePage(command, values, callIfOk, callIfError) {
-	var page = pages[command];
-	if (page) {
-		activePage = page;
-		callIfOk();
-		JanusJS.updateGui();
-	} else {
-		callIfError('Seite kann nicht angezeigt werden');
-	}
-}
-
-JanusJS.addClassFunction('menuauswahl', showActivePage)
-
-JanusJS.addClassFunction('spaetLaden', function(command, values, callIfOk,
-		callIfError) {
-
-	loadXMLPage(pages, command, function() {
-		showActivePage(command, values, callIfOk, callIfError);
-
-	});
-})
-
-loadXMLPage(pages, 'menu', function(page) {
-	JanusJS.showResult('menu', page.fill({}));
-});
+loadXMLPage(pages, 'rezepte', clearRezeptGui);

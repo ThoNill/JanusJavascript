@@ -5,12 +5,12 @@ var JanusRules = (function() {
 	function callRuleFunction(name, command, values, callOnOk, callOnError) {
 		return (ruleFunctions[name])(command, values, callOnOk, callOnError);
 	}
-	
-	function addListenerToChilds( parent, listener) {
+
+	function addListenerToChilds(parent, listener) {
 		parent.addListener(listener);
 		if (parent.childs) {
 			for (var i = 0; i < parent.childs.length; i++) {
-				addListenerToChilds(parent.childs[i],listener);
+				addListenerToChilds(parent.childs[i], listener);
 			}
 		}
 	}
@@ -23,7 +23,7 @@ var JanusRules = (function() {
 			bind : function() {
 				if (this.childs) {
 					for (var i = 0; i < this.childs.length; i++) {
-						addListenerToChilds(this.childs[i],this);
+						addListenerToChilds(this.childs[i], this);
 						this.childs[i].bind();
 					}
 				}
@@ -38,8 +38,7 @@ var JanusRules = (function() {
 			}
 
 		},
-
-		REGEXP : {
+		TrueOrFalse : {
 			bind : function() {
 				if (this.childs) {
 					for (var i = 0; i < this.childs.length; i++) {
@@ -53,18 +52,6 @@ var JanusRules = (function() {
 						child.bind();
 					}
 				}
-			},
-			configure : function() {
-				this.varname = this.attributes['at'];
-				this.negate = (this.attributes['negate'] == 'true');
-				this.regexp = new RegExp(this.attributes['re']);
-			},
-			isOk : function(values) {
-				var ok = this.regexp.test(values[this.varname]);
-				if (this.negate) {
-					ok = !ok;
-				}
-				return ok;
 			},
 			check : function(values) {
 				var ok = this.isOk(values);
@@ -134,7 +121,10 @@ var JanusRules = (function() {
 				return false;
 			},
 			check : function(values) {
-				this.checkChilds(values);
+				var ok = this.isOk(values);
+				if (!ok) {
+					this.checkChilds(values);
+				}
 			}
 		},
 
@@ -161,6 +151,81 @@ var JanusRules = (function() {
 	ruleTag.FALSE = Object.create(ruleTag.AND);
 	ruleTag.FALSE.isFalse = true;
 
+	ruleTag.REGEXP = Object.create(ruleTag.TrueOrFalse);
+
+	ruleTag.REGEXP.configure = function() {
+		this.varname = this.attributes['at'];
+		this.negate = (this.attributes['negate'] == 'true');
+		this.regexp = new RegExp(this.attributes['re']);
+	};
+
+	ruleTag.REGEXP.isOk = function(values) {
+		var ok = this.regexp.test(values[this.varname]);
+		if (this.negate) {
+			ok = !ok;
+		}
+		return ok;
+	};
+
+	ruleTag.COMP = Object.create(ruleTag.TrueOrFalse);
+
+	ruleTag.COMP.configure = function() {
+		this.relation = this.attributes['rel'];
+		this.a = this.attributes['a'];
+		this.b = this.attributes['b'];
+		this.sum = this.attributes['summe'];
+		this.zugabe = this.attributes['zugabe'];
+		this.negate = (this.attributes['negate'] == 'true');
+		this.isNumberType = (this.attributes['type'] == 'number');
+	};
+
+	ruleTag.COMP.summe = function(values) {
+		if (this.sum) {
+			var teile = this.sum.split(/ *, */);
+			var summe = 0;
+			for (var i = 0; i < teile.length; i++) {
+				var p = parseFloat(values[teile[i]]);
+				if(p && p != NaN) {
+					summe += p;
+				}
+			}
+			if (this.zugabe) {
+				summe += parseFloat(this.zugabe);
+			}
+			return summe;
+		}
+		return values[this.b];
+	};
+
+	ruleTag.COMP.isOk = function(values) {
+		var av = values[this.a];
+		var bv = this.summe(values);
+		
+		if (this.isNumberType) {
+			av = parseFloat(av);
+			bv = parseFloat(bv);
+		}
+
+		if (av && bv) {
+			if (this.relation == "lt") {
+				return av < bv;
+			}
+			if (this.relation == "le") {
+				return av <= bv;
+			}
+			if (this.relation == "eq") {
+				return av == bv;
+			}
+			if (this.relation == "gt") {
+				return av > bv;
+			}
+			if (this.relation == "ge") {
+				return av >= bv;
+			}
+		}
+		return true;
+	};
+
 	function newRule(name, sourceType, attributes) {
 		var source = Object.create(sourceType);
 		source.name = name;
@@ -186,11 +251,10 @@ var JanusRules = (function() {
 			source.currentPosition = source.positions[0];
 		}
 
-		source.checkChilds = function(values)
-		{
+		source.checkChilds = function(values) {
 			if (this.childs) {
 				for (var i = 0; i < this.childs.length; i++) {
-						this.childs[i].check(values);
+					this.childs[i].check(values);
 				}
 			}
 		}
