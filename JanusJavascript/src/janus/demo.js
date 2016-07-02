@@ -168,7 +168,8 @@ function showActivePage(command, values, callIfOk, callIfError) {
 		JanusJS.updateGui();
 		if (page.DataSources.rules) {
 			page.DataSources.rules.refresh();
-		};
+		}
+		;
 	} else {
 		callIfError('Seite kann nicht angezeigt werden');
 	}
@@ -181,42 +182,38 @@ JanusJS.addClassFunction('spaetLaden', function(command, values, callIfOk,
 
 	loadXMLPage(pages, command, function() {
 		showActivePage(command, values, callIfOk, callIfError);
-    });
+	});
 });
 loadXMLPage(pages, 'menu', function(page) {
 	JanusJS.showResult('menu', page.fill({}));
 });
 
-
-
 JanusJS.addClassFunction('rezeptSpeichern', function(command, values, callIfOk,
 		callIfError) {
-	
+
 	JanusJS.addMessage("Rezept gespeichert");
-	
+
 });
 
-
-JanusJS.addClassFunction('refresh', function(action, callOnOk,
-		callOnError) {
+JanusJS.addClassFunction('refresh', function(action, callOnOk, callOnError) {
 	action.refresh();
 	if (callOnOk) {
 		callOnOk();
 	}
 })
 
-function clearRezeptGui (page) {
+function clearRezeptGui(page) {
 	var keys = Object.getOwnPropertyNames(page.DataSources);
 	if (keys != undefined) {
 		for (var i = 0; i < keys.length; i++) {
 			var k = keys[i];
-			var field = (page.DataSources)[k]; 
+			var field = (page.DataSources)[k];
 			if (field.setValue) {
 				field.setValue("");
 			}
 		}
 	}
-//	page.DataSources.rules.refresh();
+	// page.DataSources.rules.refresh();
 }
 
 loadXMLPage(pages, 'rezepte', clearRezeptGui);

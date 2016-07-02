@@ -185,7 +185,7 @@ var JanusRules = (function() {
 			var summe = 0;
 			for (var i = 0; i < teile.length; i++) {
 				var p = parseFloat(values[teile[i]]);
-				if(p && p != NaN) {
+				if (p && p != NaN) {
 					summe += p;
 				}
 			}
@@ -200,7 +200,7 @@ var JanusRules = (function() {
 	ruleTag.COMP.isOk = function(values) {
 		var av = values[this.a];
 		var bv = this.summe(values);
-		
+
 		if (this.isNumberType) {
 			av = parseFloat(av);
 			bv = parseFloat(bv);

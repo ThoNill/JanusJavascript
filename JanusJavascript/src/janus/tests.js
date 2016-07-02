@@ -239,5 +239,4 @@ QUnit.test("rules2", function(assert) {
 
 	JanusRules.loadRulePage("regexp", onOk.bind(assert, assert));
 
-
 });
