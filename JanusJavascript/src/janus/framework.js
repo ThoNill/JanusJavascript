@@ -194,6 +194,7 @@ var JanusJS = (function() {
 			},
 
 			bind : function(DataSources) {
+				this.onInit = addToArray(this.onInit, this);
 				this
 						.bindToMultipleNames(this.attributes['source'],
 								DataSources);
@@ -352,7 +353,6 @@ var JanusJS = (function() {
 				for (var i = 0; i < this.childs.length; i++) {
 					this.childs[i].setList(this);
 				}
-				;
 				this.firstColName = this.childs[0].colName;
 				this.calculateValue = function(ev) {
 					return this.list.findValue(this.firstColName, ev.value);
@@ -385,6 +385,7 @@ var JanusJS = (function() {
 			},
 			updateData : function() {
 				if (this.doUpdate) {
+					this.doUpdate = false;
 					var rowCount = getRandomInt(3, 10);
 					this.list.currentRow = 0;
 					this.list.data = [];
@@ -1089,7 +1090,43 @@ var JanusJS = (function() {
 		end : "</div>"
 	});
 	guiTag.DIALOG.fill = startChildEndFill;
-	guiTag.DIALOG.configure = doNothing;
+	guiTag.DIALOG.configure = function() {
+
+		if (this.attributes.onInit) {
+			this.onInitAction = newDataSource("onInit", dataTag.ACTION, {
+				foreach : this.attributes.onInit,
+				name : "onInit"
+			}, DataSources);
+		}
+		;
+		if (this.attributes.onVisit) {
+			this.onVisitAction = newDataSource("onVisit", dataTag.ACTION, {
+				foreach : this.attributes.onInit,
+				name : "onVisit"
+			}, DataSources);
+		}
+		;
+	}
+	guiTag.DIALOG.callOnInit = function() {
+		if (this.onInit) {
+			for (var i = 0; i < this.onInit.length; i++) {
+				this.onInit[i].refresh();
+			}
+		}
+		if (this.onInitAction) {
+			this.onInitAction.refresh();
+		}
+	}
+	guiTag.DIALOG.callOnVisit = function() {
+		if (this.onVisit) {
+			for (var i = 0; i < this.onInit.length; i++) {
+				this.onVisit[i].refresh();
+			}
+		}
+		if (this.onVisitAction) {
+			this.onVisitAction.refresh();
+		}
+	}
 
 	guiTag.TEXTFIELD = newGuiTag(
 			"TEXTFIELD",
@@ -1525,7 +1562,7 @@ var JanusJS = (function() {
 				bindGuiChildElements(guiElement, DataSources);
 
 				createIfThen(guiElement, DataSources);
-
+				guiElement.callOnInit();
 				return guiElement;
 			}
 			JanusJS.addError("" + element.nodeName + " hat keine Zuordnung");

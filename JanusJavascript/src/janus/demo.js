@@ -1,3 +1,4 @@
+
 JanusJS.updateGui = function(ifNeeded) {
 	if (ifNeeded == true) {
 		activePage.fillIfNeeded({});
@@ -88,7 +89,6 @@ function preparePage(text) {
 			JanusJS.addError(xmlDoc.documentElement.innerHTML);
 			return undefined;
 		}
-		;
 	}
 
 	text = text.replace(/&/g, '&amp;');
@@ -107,44 +107,27 @@ function preparePage(text) {
 var pages = {};
 
 loadXMLPage(pages, 'tabs', function(page) {
-	page.DataSources.a.setValue("das ist Tab a");
-	page.DataSources.b.setValue("das ist Tab b");
 });
 
 loadXMLPage(pages, 'textfield', function(page) {
-	page.DataSources.text.refresh();
-	page.DataSources.datum.refresh();
-	page.DataSources.money.refresh();
-	page.DataSources.int.refresh();
-	page.DataSources.password.refresh();
 });
 
 loadXMLPage(pages, 'actions', function(page) {
-	page.DataSources.text.refresh();
 });
 
 loadXMLPage(pages, 'textfieldUpdates', function(page) {
-	page.DataSources.a1.refresh();
-	page.DataSources.a2.refresh();
-	page.DataSources.a3.refresh();
 });
 
 loadXMLPage(pages, 'maptable', function(page) {
 });
 
 loadXMLPage(pages, 'listen', function(page) {
-	page.DataSources.liste.refresh();
-	page.DataSources.liste.doUpdate = false;
 });
 
 loadXMLPage(pages, 'listenAuswahl', function(page) {
-	page.DataSources.liste.refresh();
-	page.DataSources.liste.doUpdate = false;
 });
 
 loadXMLPage(pages, 'rules', function(page) {
-	page.DataSources.text.setValue("");
-
 });
 
 function setClassOfDomElement(domElement, className) {
@@ -164,12 +147,12 @@ function showActivePage(command, values, callIfOk, callIfError) {
 	var page = pages[command];
 	if (page) {
 		activePage = page;
+		page.callOnVisit();
 		callIfOk();
 		JanusJS.updateGui();
 		if (page.DataSources.rules) {
 			page.DataSources.rules.refresh();
 		}
-		;
 	} else {
 		callIfError('Seite kann nicht angezeigt werden');
 	}
@@ -203,17 +186,7 @@ JanusJS.addClassFunction('refresh', function(action, callOnOk, callOnError) {
 })
 
 function clearRezeptGui(page) {
-	var keys = Object.getOwnPropertyNames(page.DataSources);
-	if (keys != undefined) {
-		for (var i = 0; i < keys.length; i++) {
-			var k = keys[i];
-			var field = (page.DataSources)[k];
-			if (field.setValue) {
-				field.setValue("");
-			}
-		}
-	}
-	// page.DataSources.rules.refresh();
+	page.callOnInit();
 }
 
 loadXMLPage(pages, 'rezepte', clearRezeptGui);
