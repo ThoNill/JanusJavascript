@@ -14,6 +14,11 @@ JanusJS.updateGui = function(ifNeeded) {
 			this.showResult('dataResult', '');
 			this.showResult('guiResult', activePage.urtext);
 		}
+		if (activePage.DataSources.rules) {
+			this.showResult('validationRules', activePage.DataSources.rules.rules.urtext);
+		} else {
+			this.showResult('validationRules', '');
+		}
 	}
 	if (ifNeeded) {
 	} else {
@@ -91,16 +96,10 @@ function preparePage(text) {
 		}
 	}
 
-	text = text.replace(/&/g, '&amp;');
-	text = text.replace(/"/g, '&quot;');
-	text = text.replace(/</g, '&lt;');
-	text = text.replace(/>/g, '&gt;');
-	text = text.replace(/\t/g, '   ');
-	text = text.replace(/ /g, '&nbsp;');
-	text = text.replace(/\n/g, '<br>');
+
 
 	var page = JanusJS.buildPage(xmlDoc.documentElement);
-	page.urtext = text;
+	page.urtext = escapeTextToShowIt(text);
 	return page;
 }
 

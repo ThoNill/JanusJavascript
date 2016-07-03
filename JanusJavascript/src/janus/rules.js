@@ -381,6 +381,10 @@ var JanusRules = (function() {
 			}
 
 			var page = buildRulePage(xmlDoc.documentElement);
+			
+			
+
+			page.urtext = escapeTextToShowIt(text);
 			return page;
 		},
 
