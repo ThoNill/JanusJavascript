@@ -1,28 +1,25 @@
-
 JanusJS.updateGui = function(ifNeeded) {
 	if (ifNeeded == true) {
 		activePage.fillIfNeeded({});
 	} else {
 		this.showResult('place', activePage.fill({}));
-	}
-	if (activePage.urtext) {
-		var i = activePage.urtext.toString().indexOf('&lt;VBOX&gt;');
-		if (i >= 0) {
-			this.showResult('dataResult', activePage.urtext.substr(0, i));
-			this.showResult('guiResult', activePage.urtext.substr(i));
-		} else {
-			this.showResult('dataResult', '');
-			this.showResult('guiResult', activePage.urtext);
+		if (activePage.urtext) {
+			var i = activePage.urtext.toString().indexOf('&lt;VBOX&gt;');
+			if (i >= 0) {
+				this.showResult('dataResult', activePage.urtext.substr(0, i));
+				this.showResult('guiResult', activePage.urtext.substr(i));
+			} else {
+				this.showResult('dataResult', '');
+				this.showResult('guiResult', activePage.urtext);
+			}
+			if (activePage.DataSources.rules) {
+				this.showResult('validationRules',
+						activePage.DataSources.rules.rules.urtext);
+			} else {
+				this.showResult('validationRules', '');
+			}
+			JanusJS.addMessage("Dialog wird angezeigt");
 		}
-		if (activePage.DataSources.rules) {
-			this.showResult('validationRules', activePage.DataSources.rules.rules.urtext);
-		} else {
-			this.showResult('validationRules', '');
-		}
-	}
-	if (ifNeeded) {
-	} else {
-		JanusJS.addMessage("Dialog wird angezeigt");
 	}
 }
 
@@ -62,10 +59,12 @@ JanusJS.showResult = function(place, text) {
 function loadXMLPage(pages, name, initFunction) {
 	$.ajax({
 		url : 'pages/' + name + '.xml',
+		name : name,
 		data : '',
 		success : function(data) {
 			try {
 				var page = preparePage(data);
+				page.url = this.name;
 				if (page) {
 					pages[name] = page;
 					initFunction(page);
@@ -95,8 +94,6 @@ function preparePage(text) {
 			return undefined;
 		}
 	}
-
-
 
 	var page = JanusJS.buildPage(xmlDoc.documentElement);
 	page.urtext = escapeTextToShowIt(text);
@@ -129,6 +126,8 @@ loadXMLPage(pages, 'listenAuswahl', function(page) {
 loadXMLPage(pages, 'rules', function(page) {
 });
 
+loadXMLPage(pages, 'rezepte', clearRezeptGui);
+
 function setClassOfDomElement(domElement, className) {
 	domElement.className += " " + className;
 }
@@ -141,6 +140,7 @@ function removeClassOfDomElement(domElement, className) {
 }
 
 JanusJS.addClassFunction('removeClass', removeClassOfDomElement);
+
 
 function showActivePage(command, values, callIfOk, callIfError) {
 	var page = pages[command];
@@ -158,7 +158,12 @@ function showActivePage(command, values, callIfOk, callIfError) {
 	}
 }
 
-JanusJS.addClassFunction('menuauswahl', showActivePage);
+JanusJS.addClassFunction('menuauswahl', function(command, values, callIfOk,
+		callIfError) {
+	showActivePage(command, values, callIfOk, callIfError);
+	addToHistory(activePage);
+
+});
 
 JanusJS.addClassFunction('spaetLaden', function(command, values, callIfOk,
 		callIfError) {
@@ -187,7 +192,20 @@ JanusJS.addClassFunction('refresh', function(action, callOnOk, callOnError) {
 
 function clearRezeptGui(page) {
 	page.callOnInit();
-	
+
 }
 
-loadXMLPage(pages, 'rezepte', clearRezeptGui);
+
+function historyChanged(data) {
+	if (data.state) {
+		showActivePage(data.state, {}, doNothing, doNothing);
+	}
+}
+
+
+function addToHistory(page) {
+	if (page) {
+		window.history.pushState(page.url, null, "#" + page.url);
+	}
+}
+window.addEventListener("popstate", historyChanged, false);
