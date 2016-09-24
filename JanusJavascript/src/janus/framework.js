@@ -18,9 +18,13 @@ var JanusJS = (function() {
 				}
 			};
 			element.ifThen = re;
-			dataElement.addListener(re);
+			
+			var autoUpdate = element.attributes['autoupdate'];
+			if (autoUpdate == undefined || "true" == autoUpdate) {
+				dataElement.addListener(re);
+			}
 		}
-		if (element.childs) {
+		if (element.childs) {			
 			for (var ci = 0; ci < element.childs.length; ci++) {
 				var child = element.childs[ci];
 				createIfThen(child, DataSources);
