@@ -20,7 +20,7 @@ var JanusJS = (function() {
 			element.ifThen = re;
 			
 			var autoUpdate = element.attributes['autoupdate'];
-			if (autoUpdate == undefined || "true" == autoUpdate) {
+			if (autoUpdate === undefined || "true" === autoUpdate) {
 				dataElement.addListener(re);
 			}
 		}
@@ -40,8 +40,6 @@ var JanusJS = (function() {
 
 	var dialogValue = {}
 
-	// var DataSources = {}
-
 	function newDataSource(name, sourceType, attributes, DataSources) {
 		var source = Object.create(sourceType);
 		source.name = name;
@@ -53,14 +51,14 @@ var JanusJS = (function() {
 		source.doUpdate = true;
 
 		source.invalidate = function() {
-			if (this.status == 'valid') {
+			if (this.status === 'valid') {
 				this.status = 'invalid';
 				needUpdate.data[this.name] = this;
 			}
 		};
 
 		source.update = function() {
-			if (this.status == 'invalid') {
+			if (this.status === 'invalid') {
 				this.status = 'refreshing';
 				needUpdate.data[this.name] = undefined;
 				this.updateData();
@@ -70,23 +68,21 @@ var JanusJS = (function() {
 		};
 
 		source.validate = function() {
-			if (this.status == 'refreshing') {
+			if (this.status === 'refreshing') {
 				this.status = 'valid';
 				dialogValue[this.name] = this.value;
 			}
 		};
 
 		source.valueChanged = function(ev) {
-			if (this.status == 'valid') {
-				if (this.hasChanged(ev)) {
+			if (this.status === 'valid' && this.hasChanged(ev)) {
 					this.value = this.calculateValue(ev);
 					this.invalidate();
-				}
 			}
 		};
 
 		source.hasChanged = function(ev) {
-			return (this.value != ev.value);
+			return (this.value !== ev.value);
 		};
 
 		source.calculateValue = function(ev) {
@@ -94,14 +90,14 @@ var JanusJS = (function() {
 		};
 
 		source.fireChanged = function(hint) {
-			if (this.listeners == undefined) {
+			if (this.listeners === undefined) {
 				return;
 			}
 			var ev = this.createEvent(hint);
 			if (this.listeners) {
 				for (var i = 0; i < this.listeners.length; i++) {
 					var u = this.listeners[i];
-					if (u.status == 'valid') {
+					if (u.status === 'valid') {
 						u.valueChanged(ev);
 					}
 				}
@@ -110,13 +106,13 @@ var JanusJS = (function() {
 
 		source.bindToName = function(name, DataSources) {
 			var partner = DataSources[name.trim()];
-			if (partner != undefined) {
+			if (partner !== undefined) {
 				partner.addListener(this);
 			}
 		};
 
 		source.bindToMultipleNames = function(names, DataSources) {
-			if (names == undefined || names == null) {
+			if (names === undefined || names === null) {
 				return;
 			}
 			;
@@ -138,13 +134,13 @@ var JanusJS = (function() {
 		updateKandidatenBestimmen : function() {
 			var kandidat = undefined;
 			var keys = Object.getOwnPropertyNames(this.data);
-			if (keys != undefined) {
+			if (keys !== undefined) {
 				for (var i = 0; i < keys.length; i++) {
 					var k = keys[i];
 					var u = this.data[k];
-					if (u != undefined
-							&& u.status == 'invalid'
-							&& (kandidat == undefined || kandidat.priority > u.priority)) {
+					if (u !== undefined
+							&& u.status === 'invalid'
+							&& (kandidat === undefined || kandidat.priority > u.priority)) {
 						kandidat = u;
 					}
 				}
@@ -155,16 +151,16 @@ var JanusJS = (function() {
 		updateValue : function() {
 			do {
 				var kandidat = this.updateKandidatenBestimmen();
-				if (kandidat != undefined) {
+				if (kandidat !== undefined) {
 					kandidat.update();
 				}
-			} while (kandidat != undefined);
+			} while (kandidat !== undefined);
 		}
 	}
 
 	function findValue(column, value) {
 		for (var i = 0; i < this.data.length; i++) {
-			if ((this.data[i])[column] == value) {
+			if ((this.data[i])[column] === value) {
 				this.currentRow = i;
 				return value;
 			}
@@ -290,7 +286,7 @@ var JanusJS = (function() {
 		},
 
 		ENTRY : {
-			bind : function(DataSources) {
+			bind : function() {
 			},
 			refresh : function() {
 			},
@@ -338,7 +334,7 @@ var JanusJS = (function() {
 				this.valueChanged(ev);
 				needUpdate.updateValue();
 			},
-			bind : function(DataSources) {
+			bind : function() {
 				for (var i = 0; i < this.childs.length; i++) {
 					this.addListener(this.childs[i]);
 				}
@@ -368,7 +364,7 @@ var JanusJS = (function() {
 				this.currentRow.setValue = function(value) {
 					this.table.setCurrentRow(value);
 				};
-				this.currentRow.calculateValue = function(ev) {
+				this.currentRow.calculateValue = function() {
 					return this.table.list.currentRow;
 				}
 				this.currentRow.status = 'valid';
@@ -416,7 +412,7 @@ var JanusJS = (function() {
 				this.table = table;
 				this.list = table.list;
 			},
-			bind : function(DataSources) {
+			bind : function() {
 			},
 			refresh : function() {
 			},
@@ -443,7 +439,7 @@ var JanusJS = (function() {
 
 			priority : 4
 		},
-		// guiActionOnGuiElements
+		
 		GUIACTION : {
 			bind : function(DataSources) {
 
@@ -457,7 +453,7 @@ var JanusJS = (function() {
 				this.classFunction = classFunctions[this.classname];
 
 			},
-			refresh : function(callOnOk, callOnError) {
+			refresh : function() {
 
 				for (var i = this.foreach.length - 1; i >= 0; i--) {
 					var dataElement = this.foreach[i];
@@ -472,7 +468,7 @@ var JanusJS = (function() {
 					var name = propertyNames[i];
 					var guiElement = allGuiElements[name];
 					var modelElement = guiElement.getModelElement();
-					if (model == modelElement) {
+					if (model === modelElement) {
 						var htmlElement = document.getElementById(name);
 						this.classFunction(htmlElement, this.param);
 					}
@@ -511,7 +507,7 @@ var JanusJS = (function() {
 				}
 
 				var callTheAction = true;
-				if (callOnOk == undefined) {
+				if (callOnOk === undefined) {
 					callOnOk = this.callListUpdate;
 				}
 				if (this.ifThen) {
@@ -570,7 +566,7 @@ var JanusJS = (function() {
 		},
 
 		TRANSFORMATION : {
-			bind : function(DataSources) {
+			bind : function() {
 			},
 			refresh : function() {
 			},
@@ -584,7 +580,7 @@ var JanusJS = (function() {
 		},
 
 		BEAN : {
-			bind : function(DataSources) {
+			bind : function() {
 			},
 			refresh : function() {
 			},
@@ -615,7 +611,7 @@ var JanusJS = (function() {
 			setBean : function(bean) {
 				this.bean = bean;
 			},
-			bind : function(DataSources) {
+			bind : function() {
 
 			},
 			refresh : function(callOnOk, callOnError) {
@@ -627,7 +623,7 @@ var JanusJS = (function() {
 				}
 
 				var values = {};
-				if (this.childs != undefined) {
+				if (this.childs !== undefined) {
 					for (var i = 0; i < this.childs.length; i++) {
 						var v = this.childs[i];
 						var value = v.getValue();
@@ -671,7 +667,7 @@ var JanusJS = (function() {
 			getValue : function() {
 				var c = this.attributes['constant'];
 				this.name = this.attributes['name'];
-				if (c == undefined) {
+				if (c === undefined) {
 					return this.value;
 				}
 				return c;
@@ -694,12 +690,12 @@ var JanusJS = (function() {
 				var c = this.attributes['constant'];
 				this.name = this.attributes['name'];
 
-				if (c == undefined) {
+				if (c === undefined) {
 					return this.DataSources[this.attributes['var']].value;
 				}
 				return c;
 			},
-			bind : function(DataSources) {
+			bind : function() {
 				this.status = 'valid';
 			},
 			refresh : function() {
@@ -715,7 +711,7 @@ var JanusJS = (function() {
 			priority : 5
 		},
 		RULES : {
-			restart : function(DataSources) {
+			restart : function() {
 				this.maxPriority = 0;
 				this.clear();
 				this.rules.restart();
@@ -740,7 +736,7 @@ var JanusJS = (function() {
 				if (this.rules) {
 					this.maxPriority = 0;
 					var values = {};
-					if (this.childs != undefined) {
+					if (this.childs !== undefined) {
 						for (var i = 0; i < this.childs.length; i++) {
 							var v = this.childs[i];
 							if (!v.isStepper()) {
@@ -772,7 +768,7 @@ var JanusJS = (function() {
 					var ruleIndex = this.stepper
 							.getPositionIndex(rule.currentPosition);
 					if (ruleIndex < currentIndex
-							|| (ruleIndex == currentIndex && this.currentRule.priority >= rule.priority)) {
+							|| (ruleIndex === currentIndex && this.currentRule.priority >= rule.priority)) {
 						this.currentRule.rule = rule;
 						this.currentRule.index = this.stepper
 								.getPositionIndex(rule.currentPosition);
@@ -824,7 +820,7 @@ var JanusJS = (function() {
 			},
 			configure : function() {
 				this.fields = {};
-				if (this.childs != undefined) {
+				if (this.childs !== undefined) {
 					for (var i = 0; i < this.childs.length; i++) {
 						var v = this.childs[i];
 						if (v.isStepper()) {
@@ -850,7 +846,7 @@ var JanusJS = (function() {
 			getValue : function() {
 				return this;
 			},
-			bind : function(DataSources) {
+			bind : function() {
 				this.status = 'valid';
 			},
 			refresh : function() {
@@ -879,16 +875,16 @@ var JanusJS = (function() {
 	}
 
 	function newDataElementFromDOM(element, prefix, DataSources) {
-		if (element.nodeType == 1) {
+		if (element.nodeType === 1) {
 			var proto = dataTag[element.nodeName];
-			if (proto != undefined) {
+			if (proto !== undefined) {
 				var attributes = convertToAttributeHash(element.attributes);
 				var name = prefix + proto.getName(attributes);
 				var dataElement = newDataSource(name, proto, attributes,
 						DataSources);
 				for (var i = 0; i < element.childNodes.length; i++) {
 					var c = element.childNodes.item(i);
-					if (c.nodeType == 1) {
+					if (c.nodeType === 1) {
 						dataElement.addChild(newDataElementFromDOM(c,
 								dataElement.prefix, DataSources));
 					}
@@ -904,7 +900,7 @@ var JanusJS = (function() {
 	function sammleVariablen(text) {
 		var liste = [];
 
-		var sammler = function(match, p1, offset, string) {
+		var sammler = function(match, p1) {
 			addToArray(liste, p1);
 			return "";
 		}
@@ -924,7 +920,7 @@ var JanusJS = (function() {
 	}
 
 	function replaceValues(template, values) {
-		if (template == undefined) {
+		if (template === undefined) {
 			return "";
 		}
 		var erg = template;
@@ -944,7 +940,7 @@ var JanusJS = (function() {
 		
 
 		if (this.model) {
-			if (this.DataSources[this.model] == undefined) {
+			if (this.DataSources[this.model] === undefined) {
 				JanusJS.addError("Modelelement " + this.model
 						+ " ist nicht definiert")
 			} else {
@@ -956,16 +952,14 @@ var JanusJS = (function() {
 			}
 		}
 
-		if (this.attributes.title != undefined) {
+		if (this.attributes.title !== undefined) {
 			newValues.title = this.attributes.title;
 		}
 
 		newValues.innerStyle = '';
 
-		if (this.ifThen) {
-			if (!this.ifThen.isOk()) {
+		if (this.ifThen && (!this.ifThen.isOk())) {
 				newValues.innerStyle = newValues.innerStyle + 'display : none;';
-			}
 		}
 
 		newValues.styleOut = ' style=\"' + newValues.innerStyle + '\" ';
@@ -993,7 +987,7 @@ var JanusJS = (function() {
 		var start = this.fillTemplate('start', newValues);
 		var end = this.fillTemplate('end', newValues);
 		var childsText = "";
-		if (this.childs != undefined) {
+		if (this.childs !== undefined) {
 			for (var ci = 0; ci < this.childs.length; ci++) {
 				var child = this.childs[ci];
 
@@ -1004,7 +998,7 @@ var JanusJS = (function() {
 		return start + childsText + end;
 	}
 
-	function noFill(values) {
+	function noFill() {
 		this.needUpdate = false;
 		return "";
 	}
@@ -1018,11 +1012,11 @@ var JanusJS = (function() {
 		var end = this.fillTemplate('end', newValues);
 		var childsText = "";
 
-		if (this.childs != undefined) {
+		if (this.childs !== undefined) {
 			var headerText = this.fillTemplate('headerStart', newValues);
 			for (var ci = 0; ci < this.childs.length; ci++) {
 				var child = this.childs[ci];
-				if (child.attributes.header == undefined) {
+				if (child.attributes.header === undefined) {
 					newValues.header = child.colName;
 				} else {
 					newValues.header = child.attributes.header;
@@ -1032,11 +1026,11 @@ var JanusJS = (function() {
 			}
 			headerText += this.fillTemplate('headerEnd', newValues);
 
-			var childsText = "";
+			
 			for (var row = 0; row < list.data.length; row++) {
 				newValues.row = row;
 				var postfix = "";
-				if (row == list.currentRow) {
+				if (row === list.currentRow) {
 					postfix = "Selected";
 				}
 				childsText += this
@@ -1065,9 +1059,7 @@ var JanusJS = (function() {
 		var start = this.fillTemplate('start', newValues);
 		var end = this.fillTemplate('end', newValues);
 		var childsText = "";
-
-		var childsText = "";
-		if (this.childs != undefined) {
+		if (this.childs !== undefined) {
 			for (var row = 0; row < list.data.length; row++) {
 
 				var rowData = list.data[row];
@@ -1077,7 +1069,7 @@ var JanusJS = (function() {
 				newValues.text = rowData.text;
 
 				var postfix = "";
-				if (row == list.currentRow) {
+				if (row === list.currentRow) {
 					postfix = "Selected";
 				}
 				childsText += this.fillTemplate('row' + postfix, newValues);
@@ -1173,11 +1165,6 @@ var JanusJS = (function() {
 	guiTag.DATEFIELD = newGuiTag(
 			"DATEFIELD",
 			{
-// DATEFIELD : "<div id='${id}' ${styleOut} >${startTooltip}<input id='ip${id}'
-// ${styleOut} class='input-control text margin10 no-margin-right ' type='date'
-// name='${model}' value='${value}' onkeypress=\"return
-// JanusJS.setElementValueEnter(event,'${id}',this.value);\"
-// />${endTooltip}</div>"
 				DATEFIELD : "<div  id='${id}' class='margin10 no-margin-right' >${startTooltip}<div ${styleOut}  class='input-control text' data-role='datepicker' data-format='dd.mm.yyyy' ><input   id='ip${id}' ${styleOut}  type='text' name='${model}' value='${value}' onkeypress=\"return JanusJS.setElementDateValueEnter(event,'${id}',this);\" /> <button class='button'><span class='mif-calendar'></span></button>${endTooltip}</div></div>"
 
 			});
@@ -1285,9 +1272,6 @@ var JanusJS = (function() {
 			{
 				start : "",
 				row : " <label  id='${id}' class='input-control radio small-check'  ${styleOut} >${startTooltip} <input type='radio' name='${model}' value='${row}' onchange=\"return JanusJS.setCurrentRow('${id}',this.value);\" > <span class='check'></span><span class='caption'>${text}</span>${endTooltip}</label>",
-				// rowSelected: "<input type='radio' name='${model}'
-				// value='${row}' checked
-				// >${text}<br/>",
 				rowSelected : " <label  id='${id}'  class='input-control radio small-check'  ${styleOut} >${startTooltip}<input type='radio' name='${model}' checked value='${row}' onchange=\"return JanusJS.setCurrentRow('${id}',this.value);\" > <span class='check'></span><span class='caption'>${text}</span>${endTooltip}</label>",
 
 				end : ""
@@ -1298,16 +1282,6 @@ var JanusJS = (function() {
 	guiTag.LIST = newGuiTag(
 			"LIST",
 			{
-				// start: "<input list='listValues${id}' name='${model}'
-				// onchange=\"return
-				// JanusJS.setCurrentRow('${id}',this.value);\" ><datalist
-				// id='listValues${id}'
-				// >",
-				// row: "<option value='${row}' >${text}</option>",
-				// rowSelected: "<option value='${row}' selected
-				// >${text}</option>",
-				// end: "</datalist>"
-
 				start : " <div  id='${id}' class='listview set-border'  id='listValues${id}'  ${styleOut} >${startTooltip}",
 				row : "<div class='list'   onClick=\"return JanusJS.setCurrentRow('${id}','${row}');\" ><span class='list-title'>${text}</span></div>",
 				rowSelected : "<div class='list block-shadow-info' onClick=\"return JanusJS.setCurrentRow('${id}','${row}');\" > </span><span class='list-title'>${text}</span></div>",
@@ -1352,10 +1326,6 @@ var JanusJS = (function() {
 	guiTag.MENUITEM.configure = doNothing;
 
 	guiTag.TAB = newGuiTag("TAB", {
-		// header: "<TH onClick='updateTab(\"${parentId}\",\"${id}\");'
-		// >${title}</TH>",
-		// header: "<li class='tabHeaderCell' id='tabHeader${id}'
-		// onClick='updateTab(\"${parentId}\",\"${id}\");' >${title}</li>",
 		header : "<li ><a href='#${id}' >${title}</a></li>",
 
 		start : "<DIV class='frame' id='${id}'  ${styleOut} >",
@@ -1372,11 +1342,6 @@ var JanusJS = (function() {
 	guiTag.TABS = newGuiTag(
 			"TABS",
 			{
-				// start: "<TABLE id='${id}' >",
-				// end: "</TABLE>",
-				// headerStart: "<TR>",
-				// headerEnd: "</TR><TR collspan='${tabCount}' ><TD>",
-
 				start : "<DIV class='tabcontrol2' data-role='tabcontrol'  data-save-state='true' id='${id}'  ${styleOut}  >",
 				end : "</DIV>",
 				headerStart : "<ul class='tabs' >",
@@ -1392,9 +1357,9 @@ var JanusJS = (function() {
 
 		var start = this.fillTemplate('start', newValues);
 		var end = this.fillTemplate('end', newValues);
-		var childsText = "";
+		
 
-		if (this.childs != undefined) {
+		if (this.childs !== undefined) {
 			newValues.tabCount = this.childs.length;
 			var headerText = this.fillTemplate('headerStart', newValues);
 			for (var ci = 0; ci < this.childs.length; ci++) {
@@ -1429,21 +1394,21 @@ var JanusJS = (function() {
 
 	function updateTab(divParent, divTab) {
 		var tabs = document.getElementById(divParent);
-		if (tabs != null) {
+		if (tabs !== null) {
 			var tab = document.getElementById(divTab);
 			var tabHeader = document.getElementById("tabHeader" + divTab);
-			if (tabs.currentTab != tab) {
-				if (tabs.currentTab != undefined) {
+			if (tabs.currentTab !== tab) {
+				if (tabs.currentTab !== undefined) {
 					var oldtab = tabs.currentTab;
 					oldtab.className = oldtab.className + " aus ";
 				}
-				if (tabs.currentTabHeader != undefined) {
+				if (tabs.currentTabHeader !== undefined) {
 					var oldtab = tabs.currentTabHeader;
 					oldtab.className = oldtab.className.replace(
 							/\bcurrentTab\b/, '');
 				}
 
-				if (tab != null) {
+				if (tab !== null) {
 					tab.className = tab.className.replace(/\baus\b/, '');
 					tabs.currentTab = tab;
 					tabHeader.className = tabHeader.className.trim()
@@ -1464,21 +1429,21 @@ var JanusJS = (function() {
 		idCounter++;
 		guiElement.addId = addId;
 		guiElement.id = 'DIV' + idCounter;
-		if (attributes != undefined) {
+		if (attributes !== undefined) {
 			guiElement.attributes = attributes;
 		}
 
 		guiElement.childs = [];
 		guiElement.addChild = addChild;
 		guiElement.getModelElement = getModelElement;
-		if (attributes != undefined) {
+		if (attributes !== undefined) {
 			guiElement.model = attributes.model;
 		}
 		allGuiElements[guiElement.id] = guiElement;
 
 		guiElement.needUpdate = true;
 
-		guiElement.valueChanged = function(ev) {
+		guiElement.valueChanged = function() {
 			this.needUpdate = true;
 		}
 		guiElement.fillIfNeeded = fillIfNeeded;
@@ -1488,14 +1453,14 @@ var JanusJS = (function() {
 	}
 
 	function newGuiElementFromDOM(element, DataSources) {
-		if (element.nodeType == 1) {
+		if (element.nodeType === 1) {
 			var proto = guiTag[element.nodeName];
-			if (proto != undefined) {
+			if (proto !== undefined) {
 				var guiElement = newGuiElement(proto,
 						convertToAttributeHash(element.attributes), DataSources);
 				for (var i = 0; i < element.childNodes.length; i++) {
 					var c = element.childNodes.item(i);
-					if (c.nodeType == 1) {
+					if (c.nodeType === 1) {
 						guiElement
 								.addChild(newGuiElementFromDOM(c, DataSources));
 					}
@@ -1504,7 +1469,6 @@ var JanusJS = (function() {
 				guiElement.needUpdate = true;
 				return guiElement;
 			}
-			// alert("" + element.nodeName +" hat keine Zuordnung");
 			return undefined;
 		}
 		return undefined;
@@ -1512,22 +1476,22 @@ var JanusJS = (function() {
 
 	function getModelElement() {
 		var modelName = this.attributes['model'];
-		if (modelName == undefined) {
+		if (modelName === undefined) {
 			return undefined;
 		}
 		return this.DataSources[modelName];
 	}
 
-	function bindGuiElement(element, DataSources) {
+	function bindGuiElement(element) {
 		var modelElement = element.getModelElement();
-		if (modelElement != undefined) {
+		if (modelElement !== undefined) {
 			modelElement.addListener(element);
 		}
 	}
 
 	function bindGuiChildElements(element, DataSources) {
 		bindGuiElement(element, DataSources);
-		if (element.childs != undefined) {
+		if (element.childs !== undefined) {
 			for (var ci = 0; ci < element.childs.length; ci++) {
 				var child = element.childs[ci];
 				bindGuiChildElements(child, DataSources);
@@ -1536,17 +1500,17 @@ var JanusJS = (function() {
 	}
 
 	function fillIfNeeded(values, element) {
-		if (element == undefined) {
+		if (element === undefined) {
 			element = this;
 		}
 		if (element.needUpdate) {
 			element.needUpdate = false;
 			var text = element.fill(values);
 			var oldDomElement = document.getElementById(element.id);
-			if (oldDomElement != null && oldDomElement != undefined) {
+			if (oldDomElement !== null && oldDomElement !== undefined) {
 
 				try {
-					if (oldDomElement.parentNode != undefined) {
+					if (oldDomElement.parentNode !== undefined) {
 						oldDomElement.parentNode.innerHTML = text;
 					}
 				} catch (e) {
@@ -1557,7 +1521,7 @@ var JanusJS = (function() {
 
 			}
 		}
-		if (element.childs != undefined) {
+		if (element.childs !== undefined) {
 			for (var ci = 0; ci < element.childs.length; ci++) {
 				var child = element.childs[ci];
 				fillIfNeeded(values, child);
@@ -1569,7 +1533,8 @@ var JanusJS = (function() {
 	return {
 
 		buildPage : function(element) {
-			if (element.nodeType == 1) {
+			if (element.nodeType === 1) {
+				
 				DataSources = {};
 
 				var guiElement = newGuiElementFromDOM(element, DataSources);
@@ -1578,7 +1543,7 @@ var JanusJS = (function() {
 				guiElement.data.addChild = addChild;
 				for (var i = 0; i < element.childNodes.length; i++) {
 					var c = element.childNodes.item(i);
-					if (c.nodeType == 1) {
+					if (c.nodeType === 1) {
 						var source = newDataElementFromDOM(c, '', DataSources);
 						if (source) {
 							guiElement.data.addChild(source);
@@ -1610,7 +1575,7 @@ var JanusJS = (function() {
 		},
 
 		setCurrentRow : function(divID, row) {
-			// alert( model + row );
+		
 			this.getModelElementFromDivID(divID).setCurrentRow(row);
 			this.updateGui(true);
 			return false;
@@ -1624,14 +1589,12 @@ var JanusJS = (function() {
 				if (modelElement.DataSources && modelElement.DataSources.rules) {
 					modelElement.DataSources.rules.refresh();
 				}
-			} else {
-				// alert(modelElement.name);
-			}
+			} 
 			return false;
 		},
 
 		setElementValueEnter : function(event, divID, value) {
-			if (event.which == 13 || event.keyCode == 13) {
+			if (event.which === 13 || event.keyCode === 13) {
 				this.setModelElementValue(divID, value);
 				return true;
 			}
@@ -1641,7 +1604,7 @@ var JanusJS = (function() {
 		setElementDateValueEnter : function(event, divID, obj) {
 			var value = obj.value;
 			var keyCode = event.keyCode;
-			if (keyCode == 0 || keyCode == undefined) {
+			if (keyCode === 0 || keyCode === undefined) {
 				keyCode = event.which;
 			}
 			if (keyCode >= 48 && keyCode <= 57) {
@@ -1658,30 +1621,28 @@ var JanusJS = (function() {
 					}
 					break;
 				case 1:
-					if (value == '0' || value == "1" || value == "2" || (value == "3" && keyCode <=1)) {
+					if (value === '0' || value === "1" || value === "2" || (value === "3" && keyCode <=1)) {
 						obj.value = value + c + ".";
 					}
 					break;
-				case  2:
-					obj.value = value +  ".";
-					break;
-				case  3:
+				case 3:
 					if (keyCode <=1) {
 						obj.value = value +c;
 					} else {
 						obj.value = value +"0" + c + ".";
 					}
 					break;
-				case  4:
-					if (value[3] == '0' || (value[3] == "1" && keyCode <=2)) {
+				case 4:
+					if (value[3] === '0' || (value[3] === "1" && keyCode <=2)) {
 						obj.value = value + c + ".";
 					}
 					break;
-				case  5:
+				case 2:
+				case 5:
 					obj.value = value +  ".";
 					break;
-				case  6:
-					if (keyCode == 9) {
+				case 6:
+					if (keyCode === 9) {
 						obj.value = value + "19";
 					} else {
 						obj.value = value + "20" + c;
@@ -1695,11 +1656,11 @@ var JanusJS = (function() {
 				}
 				return false;
 			}
-			if (keyCode == 13) {
+			if (keyCode === 13) {
 				this.setModelElementValue(divID, value);
 				return true;
 			}
-			if (keyCode == 46) {
+			if (keyCode === 46) {
 				obj.value = value.substr(0,value.length-2);
 				return true;
 			}

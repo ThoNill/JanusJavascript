@@ -162,7 +162,7 @@ var JanusRules = (function() {
 
 	ruleTag.REGEXP.configure = function() {
 		this.varname = this.attributes['at'];
-		this.negate = (this.attributes['negate'] == 'true');
+		this.negate = (this.attributes['negate'] === 'true');
 		this.regexp = new RegExp(this.attributes['re']);
 	};
 
@@ -182,8 +182,8 @@ var JanusRules = (function() {
 		this.b = this.attributes['b'];
 		this.sum = this.attributes['summe'];
 		this.zugabe = this.attributes['zugabe'];
-		this.negate = (this.attributes['negate'] == 'true');
-		this.isNumberType = (this.attributes['type'] == 'number');
+		this.negate = (this.attributes['negate'] === 'true');
+		this.isNumberType = (this.attributes['type'] === 'number');
 	};
 
 	ruleTag.COMP.summe = function(values) {
@@ -192,7 +192,7 @@ var JanusRules = (function() {
 			var summe = 0;
 			for (var i = 0; i < teile.length; i++) {
 				var p = parseFloat(values[teile[i]]);
-				if (p && p != NaN) {
+				if (p && p !== NaN) {
 					summe += p;
 				}
 			}
@@ -214,19 +214,19 @@ var JanusRules = (function() {
 		}
 
 		if (av && bv) {
-			if (this.relation == "lt") {
+			if (this.relation === "lt") {
 				return av < bv;
 			}
-			if (this.relation == "le") {
+			if (this.relation === "le") {
 				return av <= bv;
 			}
-			if (this.relation == "eq") {
-				return av == bv;
+			if (this.relation === "eq") {
+				return av === bv;
 			}
-			if (this.relation == "gt") {
+			if (this.relation === "gt") {
 				return av > bv;
 			}
-			if (this.relation == "ge") {
+			if (this.relation === "ge") {
 				return av >= bv;
 			}
 		}
@@ -299,7 +299,7 @@ var JanusRules = (function() {
 
 		source.showMessage = function() {
 			return this.priority > 2
-					|| (this.priority > 1 && this.allreadyCalled == false);
+					|| (this.priority > 1 && this.allreadyCalled === false);
 		}
 
 		source.selected = function() {
@@ -308,7 +308,7 @@ var JanusRules = (function() {
 		}
 
 		source.fireError = function(rule) {
-			if (this.listeners == undefined) {
+			if (this.listeners === undefined) {
 				return;
 			}
 			if (this.listeners) {
@@ -323,15 +323,15 @@ var JanusRules = (function() {
 	}
 
 	function newRuleElementFromDOM(element, prefix) {
-		if (element.nodeType == 1) {
+		if (element.nodeType === 1) {
 			var proto = ruleTag[element.nodeName];
-			if (proto != undefined) {
+			if (proto !== undefined) {
 				var attributes = convertToAttributeHash(element.attributes);
 				var name = attributes['name'];
 				var dataElement = newRule(name, proto, attributes);
 				for (var i = 0; i < element.childNodes.length; i++) {
 					var c = element.childNodes.item(i);
-					if (c.nodeType == 1) {
+					if (c.nodeType === 1) {
 						dataElement.addChild(newRuleElementFromDOM(c,
 								dataElement.prefix));
 					}
@@ -345,7 +345,7 @@ var JanusRules = (function() {
 	}
 
 	function buildRulePage(element) {
-		if (element.nodeType == 1) {
+		if (element.nodeType === 1) {
 
 			var ruleElement = newRuleElementFromDOM(element);
 
@@ -353,7 +353,7 @@ var JanusRules = (function() {
 			ruleElement.data.addChild = addChild;
 			for (var i = 0; i < element.childNodes.length; i++) {
 				var c = element.childNodes.item(i);
-				if (c.nodeType == 1) {
+				if (c.nodeType === 1) {
 					var source = newRuleElementFromDOM(c, '');
 					if (source) {
 						ruleElement.data.addChild(source);

@@ -3,15 +3,15 @@ function doNothing() {
 }
 
 function getName(attributes) {
-	if (attributes == undefined) {
+	if (attributes === undefined) {
 		return this.getName(this.attributes);
 	}
 	return attributes['name'];
 }
 
 function addToArray(arr, child) {
-	if (child != undefined) {
-		if (arr == undefined) {
+	if (child !== undefined) {
+		if (arr === undefined) {
 			arr = [];
 		}
 		arr[arr.length] = child;
@@ -31,7 +31,7 @@ function addListener(child) {
 
 function convertToAttributeHash(domAttributes) {
 	var attributes = {};
-	if (domAttributes != undefined) {
+	if (domAttributes !== undefined) {
 		for (var i = 0; i < domAttributes.length; i++) {
 			var a = domAttributes.item(i);
 			attributes[a.name] = a.value;

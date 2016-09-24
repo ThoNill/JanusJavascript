@@ -1,5 +1,5 @@
 JanusJS.updateGui = function(ifNeeded) {
-	if (ifNeeded == true) {
+	if (ifNeeded === true) {
 		activePage.fillIfNeeded({});
 	} else {
 		this.showResult('place', activePage.fill({}));
@@ -50,7 +50,7 @@ JanusJS.addMessage = function(text) {
 
 JanusJS.showResult = function(place, text) {
 	var place = document.getElementById(place);
-	if (place != undefined) {
+	if (place !== undefined) {
 		place.innerHTML = text;
 	}
 	return place;
